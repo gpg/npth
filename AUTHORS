@@ -1,0 +1,18 @@
+Package: npth
+Maintainer: Marcus Brinkmann <marcus@g10code.com>
+Bug reports: gnupg-devel@gnupg.org
+Security related bug reports: security@gnupg.org
+License (software): LGPLv2.1+
+
+g10 Code GmbH <code@g10code.com>
+ - Design and implementation.
+
+ Copyright 2011 g10 Code GmbH
+
+ This file is free software; as a special exception the author gives
+ unlimited permission to copy and/or distribute it, with or without
+ modifications, as long as this notice is preserved.
+
+ This file is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
+ implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
