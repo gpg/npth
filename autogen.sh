@@ -1,6 +1,4 @@
 #! /bin/sh
-# Run this to generate all the initial makefiles, etc.
-#
 # Copyright (C) 2003 g10 Code GmbH
 #
 # This file is free software; as a special exception the author gives
@@ -10,6 +8,10 @@
 # This program is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+#
+# Run this to generate all the initial makefiles, etc.
+#
 
 configure_ac="configure.ac"
 
@@ -243,10 +245,25 @@ if test "$DIE" = "yes"; then
     cat <<EOF
 
 Note that you may use alternative versions of the tools by setting
-the corresponding environment variables; see README.CVS for details.
+the corresponding environment variables; see README.GIT for details.
 
 EOF
     exit 1
+fi
+
+# Check the git setup.
+if [ -d .git ]; then
+  if [ -f .git/hooks/pre-commit.sample -a ! -f .git/hooks/pre-commit ] ; then
+    cat <<EOF >&2
+*** Activating trailing whitespace git pre-commit hook. ***
+    For more information see this thread:
+      http://mail.gnome.org/archives/desktop-devel-list/2009-May/msg00084html
+    To deactivate this pre-commit hook again move .git/hooks/pre-commit
+    and .git/hooks/pre-commit.sample out of the way.
+EOF
+      cp -av .git/hooks/pre-commit.sample .git/hooks/pre-commit
+      chmod -c +x  .git/hooks/pre-commit
+  fi
 fi
 
 echo "Running aclocal -I m4 ${ACLOCAL_FLAGS:+$ACLOCAL_FLAGS }..."

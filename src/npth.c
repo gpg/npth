@@ -1,4 +1,5 @@
 /* npth.c - a lightweight implementation of pth over pthread.
+   Copyright (C) 2011 g10 Code GmbH
 
    This file is part of NPTH.
 
@@ -10,13 +11,13 @@
    your option) any later version.
 
    or
-   
+
    - the GNU General Public License as published by the Free
    Software Foundation; either version 2 of the License, or (at
    your option) any later version.
-    
+
    or both in parallel, as here.
- 
+
    NPTH is distributed in the hope that it will be useful, but WITHOUT
    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
@@ -44,8 +45,10 @@
 #define _npth_debug(x, ...) printf(__VA_ARGS__)
 
 #ifndef TEST
+#undef  DEBUG_CALLS
 #define DEBUG_CALLS 0
-#define _npth_debug(x, ...) 
+#undef _npth_debug
+#define _npth_debug(x, ...)
 #endif
 
 /* The global lock that excludes all threads but one.  This is a
@@ -297,7 +300,7 @@ npth_pselect(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
 	     const struct timespec *timeout, const sigset_t *sigmask)
 {
   int res;
-  
+
   ENTER();
   res = pselect(nfd, rfds, wfds, efds, timeout, sigmask);
   LEAVE();
@@ -309,7 +312,7 @@ ssize_t
 npth_read(int fd, void *buf, size_t nbytes)
 {
   ssize_t res;
-  
+
   ENTER();
   res = read(fd, buf, nbytes);
   LEAVE();
@@ -359,7 +362,7 @@ main (int argc, char *argv[])
 {
   npth_mutex_t mutex;
   npth_init ();
-  
+
   npth_mutex_init (&mutex);
 }
 #endif

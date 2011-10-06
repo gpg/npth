@@ -1,4 +1,5 @@
 /* npth.h - a lightweight implementation of pth over pthread.
+   Copyright (C) 2011 g10 Code GmbH
 
    This file is part of NPTH.
 
@@ -10,13 +11,13 @@
    your option) any later version.
 
    or
-   
+
    - the GNU General Public License as published by the Free
    Software Foundation; either version 2 of the License, or (at
    your option) any later version.
-    
+
    or both in parallel, as here.
- 
+
    NPTH is distributed in the hope that it will be useful, but WITHOUT
    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
@@ -38,7 +39,7 @@
    timed and try.
 
    * No _new functions.  Use _init functions instead.
-   
+
    * Attributes are set by specific instead of generic getter/setter
    functions.
 
@@ -46,6 +47,9 @@
 
    TODO: Don't make locks recursive by default.  Currently, the mutex
    functions don't follow the pthread variants yet.  */
+
+#ifndef _NPTH_H
+#define _NPTH_H
 
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -55,6 +59,14 @@
 #include <errno.h>
 
 #include <pthread.h>
+
+#ifdef __cplusplus
+extern "C" {
+#if 0 /* (Keep Emacsens' auto-indent happy.) */
+}
+#endif
+#endif
+
 
 
 /* Global Library Management */
@@ -131,7 +143,7 @@ int npth_init(void);
 /* pth_event, pth_event_typeof, pth_event_extract, pth_event_concat, pth_event_isolate,
    pth_event_walk, pth_event_status, pth_event_free */
 
-	 
+
 /* Key-Based Storage */
 
 #define npth_key_t pthread_key_t
@@ -403,3 +415,12 @@ sigset_t *npth_sigev_sigmask (void);
 /* Return the next signal event that occured.  Returns if none are
    left, 1 on success.  */
 int npth_sigev_get_pending (int *r_signum);
+
+
+#if 0 /* (Keep Emacsens' auto-indent happy.) */
+{
+#endif
+#ifdef __cplusplus
+}
+#endif
+#endif /*_NPTH_H*/

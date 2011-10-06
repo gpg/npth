@@ -1,5 +1,5 @@
-# Copyright (C) 2000 Werner Koch (dd9jn)
-# Copyright (C) 2001, 2002, 2003, 2004, 2005, 2007, 2011 g10 Code GmbH
+# Makefile.am - src/ Makefile for npth.
+# Copyright (C) 2011 g10 Code GmbH
 #
 # This file is part of NPTH.
 #
@@ -29,7 +29,8 @@
 ## Process this file with automake to produce Makefile.in
 
 EXTRA_DIST = npth-config.in npth.m4 libnpth.vers \
-	     npth.h.in versioninfo.rc.in npth.def
+	     npth.def
+#	     versioninfo.rc.in
 bin_SCRIPTS = npth-config
 m4datadir = $(datadir)/aclocal
 m4data_DATA = npth.m4
@@ -45,8 +46,8 @@ endif
 
 libnpth_la_SOURCES = npth.h npth.c npth-sigev.c
 
-# AM_CPPFLAGS = 
-# AM_CFLAGS = 
+# AM_CPPFLAGS =
+# AM_CFLAGS =
 
 if HAVE_W32_SYSTEM
 RCCOMPILE = $(RC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES)

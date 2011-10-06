@@ -1,14 +1,21 @@
-#                                               -*- Autoconf -*-
-# Process this file with autoconf to produce a configure script.
-#
+# configure.ac                                          -*- Autoconf -*-
 # Copyright (C) 2011 g10 Code GmbH
-#
 # This file is part of NPTH.
 #
 # NPTH is free software; you can redistribute it and/or modify it
-# under the terms of the GNU Lesser General Public License as
-# published by the Free Software Foundation; either version 2.1 of the
-# License, or (at your option) any later version.
+# under the terms of either
+#
+# - the GNU Lesser General Public License as published by the Free
+# Software Foundation; either version 3 of the License, or (at
+# your option) any later version.
+#
+# or
+#
+# - the GNU General Public License as published by the Free
+# Software Foundation; either version 2 of the License, or (at
+# your option) any later version.
+#
+# or both in parallel, as here.
 #
 # NPTH is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
@@ -17,6 +24,8 @@
 #
 # You should have received a copy of the GNU Lesser General Public
 # License along with this program; if not, see <http://www.gnu.org/licenses/>.
+
+# Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.67])
 min_automake_version="1.11"
@@ -30,7 +39,7 @@ min_automake_version="1.11"
 # specific feature can already be done under the assumption that the
 # SVN version is the most recent one in a branch.  To disable the SVN
 # version for the real release, set the my_issvn macro to no.
-m4_define(my_version, [0.1.1])
+m4_define(my_version, [0.0])
 m4_define(my_issvn, [yes])
 
 m4_define([git_revision], m4_esyscmd([git branch -v 2>/dev/null \
@@ -46,8 +55,6 @@ AC_INIT([npth],
 #   (Interfaces removed/changed:	AGE=0)
 #
 LIBNPTH_LT_CURRENT=0
-# Subtract 2 from this value if you want to make the LFS transition an
-# ABI break.  [Note to self: Remove this comment with the next regular break.]
 LIBNPTH_LT_AGE=0
 LIBNPTH_LT_REVISION=0
 
@@ -170,7 +177,7 @@ AC_SUBST(BUILD_TIMESTAMP)
 AC_SUBST(BUILD_FILEVERSION)
 
 # Substitution used for npth-config
-NPTH_CONFIG_LIBS="-lgpgme"
+NPTH_CONFIG_LIBS="-lposix -lrt"
 NPTH_CONFIG_CFLAGS=""
 NPTH_CONFIG_HOST="$host"
 AC_SUBST(NPTH_CONFIG_API_VERSION)

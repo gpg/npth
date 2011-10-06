@@ -1,5 +1,5 @@
-# Copyright (C) 2000 Werner Koch (dd9jn)
-# Copyright (C) 2001, 2002, 2003, 2004, 2005, 2007, 2011 g10 Code GmbH
+# Makefile.am - Top level Makefile for npth.
+# Copyright (C) 2011 g10 Code GmbH
 #
 # This file is part of NPTH.
 #
@@ -19,19 +19,19 @@
 ## Process this file with automake to produce Makefile.in
 
 ACLOCAL_AMFLAGS = -I m4
-AUTOMAKE_OPTIONS = dist-bzip2
+AUTOMAKE_OPTIONS = dist-bzip2 no-dist-gzip
 
 EXTRA_DIST = npth.spec.in autogen.sh
 
 if RUN_TESTS
 tests = tests
 else
-tests = 
+tests =
 endif
 
 SUBDIRS = src ${tests}
 
-# Fix the version of the spec file and create a file named VERSION 
+# Fix the version of the spec file and create a file named VERSION
 # to be used for patch's Prereq: feature.
 dist-hook:
 	@set -e; \

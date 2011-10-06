@@ -15,15 +15,25 @@
 
 
 
-# Copyright (C) 2000 Werner Koch (dd9jn)
-# Copyright (C) 2001, 2002, 2003, 2004, 2005, 2007, 2011 g10 Code GmbH
+# Makefile.am - src/ Makefile for npth.
+# Copyright (C) 2011 g10 Code GmbH
 #
 # This file is part of NPTH.
 #
 # NPTH is free software; you can redistribute it and/or modify it
-# under the terms of the GNU Lesser General Public License as
-# published by the Free Software Foundation; either version 2.1 of the
-# License, or (at your option) any later version.
+# under the terms of either
+#
+# - the GNU Lesser General Public License as published by the Free
+# Software Foundation; either version 3 of the License, or (at
+# your option) any later version.
+#
+# or
+#
+# - the GNU General Public License as published by the Free
+# Software Foundation; either version 2 of the License, or (at
+# your option) any later version.
+#
+# or both in parallel, as here.
 #
 # NPTH is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
@@ -53,8 +63,8 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-build_triplet = x86_64-unknown-linux-gnu
-host_triplet = x86_64-unknown-linux-gnu
+build_triplet = i686-pc-linux-gnu
+host_triplet = i686-pc-linux-gnu
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/npth-config.in
@@ -120,16 +130,16 @@ HEADERS = $(nodist_include_HEADERS)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /home/marcus/g10/work/npth-build/missing --run aclocal-1.11
-AMTAR = ${SHELL} /home/marcus/g10/work/npth-build/missing --run tar
+ACLOCAL = ${SHELL} /home/wk/w/npth/missing --run aclocal-1.11
+AMTAR = ${SHELL} /home/wk/w/npth/missing --run tar
 AR = ar
 AS = as
-AUTOCONF = ${SHELL} /home/marcus/g10/work/npth-build/missing --run autoconf
-AUTOHEADER = ${SHELL} /home/marcus/g10/work/npth-build/missing --run autoheader
-AUTOMAKE = ${SHELL} /home/marcus/g10/work/npth-build/missing --run automake-1.11
+AUTOCONF = ${SHELL} /home/wk/w/npth/missing --run autoconf
+AUTOHEADER = ${SHELL} /home/wk/w/npth/missing --run autoheader
+AUTOMAKE = ${SHELL} /home/wk/w/npth/missing --run automake-1.11
 AWK = gawk
 BUILD_FILEVERSION = 
-BUILD_REVISION = 65305
+BUILD_REVISION = 28538
 BUILD_TIMESTAMP = 
 CC = gcc
 CCDEPMODE = depmode=gcc3
@@ -139,7 +149,7 @@ CPPFLAGS =
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
-DLLTOOL = dlltool
+DLLTOOL = false
 DSYMUTIL = 
 DUMPBIN = 
 ECHO_C = 
@@ -154,7 +164,7 @@ INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
-LD = /usr/bin/ld -m elf_x86_64
+LD = /usr/bin/ld
 LDFLAGS = 
 LIBNPTH_LT_AGE = 0
 LIBNPTH_LT_CURRENT = 0
@@ -166,14 +176,15 @@ LIPO =
 LN_S = ln -s
 LTLIBOBJS = 
 MAINT = 
-MAKEINFO = ${SHELL} /home/marcus/g10/work/npth-build/missing --run makeinfo
+MAKEINFO = ${SHELL} /home/wk/w/npth/missing --run makeinfo
+MANIFEST_TOOL = :
 MKDIR_P = /bin/mkdir -p
 NM = /usr/bin/nm -B
 NMEDIT = 
 NPTH_CONFIG_API_VERSION = 1
 NPTH_CONFIG_CFLAGS = 
-NPTH_CONFIG_HOST = x86_64-unknown-linux-gnu
-NPTH_CONFIG_LIBS = -lgpgme
+NPTH_CONFIG_HOST = i686-pc-linux-gnu
+NPTH_CONFIG_LIBS = -lposix -lrt
 OBJDUMP = objdump
 OBJEXT = o
 OTOOL = 
@@ -181,10 +192,10 @@ OTOOL64 =
 PACKAGE = npth
 PACKAGE_BUGREPORT = gnupg-devel@gnupg.org
 PACKAGE_NAME = npth
-PACKAGE_STRING = npth 0.1.1-gitff198f1
+PACKAGE_STRING = npth 0.0-git6f7a354
 PACKAGE_TARNAME = npth
 PACKAGE_URL = 
-PACKAGE_VERSION = 0.1.1-gitff198f1
+PACKAGE_VERSION = 0.0-git6f7a354
 PATH_SEPARATOR = :
 RANLIB = ranlib
 RC = 
@@ -192,11 +203,12 @@ SED = /bin/sed
 SET_MAKE = 
 SHELL = /bin/bash
 STRIP = strip
-VERSION = 0.1.1-gitff198f1
-abs_builddir = /home/marcus/g10/work/npth-build/src
-abs_srcdir = /home/marcus/g10/work/npth-build/src
-abs_top_builddir = /home/marcus/g10/work/npth-build
-abs_top_srcdir = /home/marcus/g10/work/npth-build
+VERSION = 0.0-git6f7a354
+abs_builddir = /home/wk/w/npth/src
+abs_srcdir = /home/wk/w/npth/src
+abs_top_builddir = /home/wk/w/npth
+abs_top_srcdir = /home/wk/w/npth
+ac_ct_AR = ar
 ac_ct_CC = gcc
 ac_ct_DUMPBIN = 
 am__include = include
@@ -205,36 +217,35 @@ am__quote =
 am__tar = ${AMTAR} chof - "$$tardir"
 am__untar = ${AMTAR} xf -
 bindir = ${exec_prefix}/bin
-build = x86_64-unknown-linux-gnu
+build = i686-pc-linux-gnu
 build_alias = 
-build_cpu = x86_64
+build_cpu = i686
 build_os = linux-gnu
-build_vendor = unknown
+build_vendor = pc
 builddir = .
 datadir = ${datarootdir}
 datarootdir = ${prefix}/share
 docdir = ${datarootdir}/doc/${PACKAGE_TARNAME}
 dvidir = ${docdir}
 exec_prefix = ${prefix}
-host = x86_64-unknown-linux-gnu
+host = i686-pc-linux-gnu
 host_alias = 
-host_cpu = x86_64
+host_cpu = i686
 host_os = linux-gnu
-host_vendor = unknown
+host_vendor = pc
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/marcus/g10/work/npth-build/install-sh
+install_sh = ${SHELL} /home/wk/w/npth/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
 localstatedir = ${prefix}/var
-lt_ECHO = echo
 mandir = ${datarootdir}/man
 mkdir_p = /bin/mkdir -p
 oldincludedir = /usr/include
 pdfdir = ${docdir}
-prefix = /home/marcus/g10/work/speedo/playground/install/pkgs/npth
+prefix = /usr/local
 program_transform_name = s,x,x,
 psdir = ${docdir}
 sbindir = ${exec_prefix}/sbin
@@ -245,11 +256,10 @@ target_alias =
 top_build_prefix = ../
 top_builddir = ..
 top_srcdir = ..
-
-# Note: moc_kdpipeiodevice should actually be a dependcy below.
 EXTRA_DIST = npth-config.in npth.m4 libnpth.vers \
-	     npth.h.in versioninfo.rc.in npth.def
+	     npth.def
 
+#	     versioninfo.rc.in
 bin_SCRIPTS = npth-config
 m4datadir = $(datadir)/aclocal
 m4data_DATA = npth.m4
@@ -259,8 +269,8 @@ lib_LTLIBRARIES = libnpth.la
 libnpth_version_script_cmd = -Wl,--version-script=$(srcdir)/libnpth.vers
 libnpth_la_SOURCES = npth.h npth.c npth-sigev.c
 
-# AM_CPPFLAGS = 
-# AM_CFLAGS = 
+# AM_CPPFLAGS =
+# AM_CFLAGS =
 #RCCOMPILE = $(RC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES)
 #LTRCCOMPILE = $(LIBTOOL) --mode=compile --tag=RC $(RCCOMPILE)
 #SUFFIXES = .rc .lo
