@@ -184,11 +184,21 @@ int npth_init(void);
 
 /* Synchronization */
 
-typedef pthread_mutex_t npth_mutex_t;
-#define NPTH_MUTEX_INITIALIZER PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP
-#define NPTH_RECURSIVE_MUTEX_INITIALIZER PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP
+#define npth_mutexattr_t pthread_mutexattr_t
+#define npth_mutexattr_init pthread_mutexattr_init
+#define npth_mutexattr_destroy pthread_mutexattr_destroy
+#define npth_mutexattr_settype pthread_mutexattr_settype
+#define npth_mutexattr_gettype pthread_mutexattr_gettype
+#define NPTH_MUTEX_NORMAL PTHREAD_MUTEX_NORMAL
+#define NPTH_MUTEX_RECURSIVE PTHREAD_MUTEX_RECURSIVE
+#define NPTH_MUTEX_ERRORCHECK PTHREAD_MUTEX_ERRORCHECK
+#define NPTH_MUTEX_DEFAULT PTHREAD_MUTEX_DEFAULT
+
+#define npth_mutex_t pthread_mutex_t
+#define NPTH_MUTEX_INITIALIZER PTHREAD_MUTEX_INITIALIZER
+#define NPTH_RECURSIVE_MUTEX_INITIALIZER_NP PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP
 /* FIXME: Go away from recursive lock default.  */
-int npth_mutex_init(npth_mutex_t *mutex);
+#define npth_mutex_init pthread_mutex_init
 #define npth_mutex_trylock pthread_mutex_trylock
 
 int _npth_mutex_lock(npth_mutex_t *mutex);
@@ -219,7 +229,8 @@ npth_mutex_timedlock(npth_mutex_t *mutex, const struct timespec *abstime)
 
 typedef pthread_rwlock_t npth_rwlock_t;
 #define NPTH_RWLOCK_INIT PTHREAD_RWLOCK_INITIALIZER
-#define npth_rwlock_init(rwlock) pthread_rwlock_init(rwlock, NULL)
+/* For now, we don't support any rwlock attributes.  */
+#define npth_rwlock_init pthread_rwlock_init
 #define npth_rwlock_tryrdlock pthread_rwlock_tryrdlock
 
 int _npth_rwlock_rdlock (npth_rwlock_t *rwlock);
@@ -277,7 +288,8 @@ npth_rwlock_timedwrlock (npth_rwlock_t *rwlock, const struct timespec *abstime)
 
 typedef pthread_cond_t npth_cond_t;
 #define NPTH_COND_INITIALIZER PTHREAD_COND_INITIALIZER
-#define npth_cond_init(cond) pthread_cond_init(cond, NULL)
+/* For now, we don't support any cond attributes.  */
+#define npth_cond_init pthread_cond_init
 #define npth_cond_broadcast pthread_cond_broadcast
 #define npth_cond_signal pthread_cond_signal
 #define npth_cond_destroy pthread_cond_destroy

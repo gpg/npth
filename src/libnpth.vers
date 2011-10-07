@@ -23,7 +23,6 @@
 NPTH_1.0 {
   global:
     npth_init;
-    npth_mutex_init;
     _npth_mutex_lock;
     _npth_mutex_timedlock;
     _npth_rwlock_rdlock;

@@ -108,22 +108,6 @@ npth_init (void)
 
 
 int
-npth_mutex_init (npth_mutex_t *mutex)
-{
-  int err;
-  pthread_mutexattr_t attr;
-
-  err = pthread_mutexattr_init(&attr);
-  assert (!err);
-  err = pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-  assert (!err);
-  pthread_mutex_init(mutex, &attr);
-  pthread_mutexattr_destroy(&attr);
-  return 0;
-}
-
-
-int
 _npth_mutex_lock (npth_mutex_t *mutex)
 {
   int err;
