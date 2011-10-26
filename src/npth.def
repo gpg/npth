@@ -20,34 +20,35 @@
 
 EXPORTS
     npth_init				@1
-    _npth_mutex_lock			@2
-    _npth_mutex_timedlock		@3
-    _npth_rwlock_rdlock			@4
-    _npth_rwlock_timedrdlock		@5
-    _npth_rwlock_wrlock			@6
-    _npth_rwlock_timedwrlock		@7
-    npth_cond_wait			@8
-    npth_cond_timedwait			@9
-    npth_usleep				@10
-    npth_sleep				@11
-    npth_waitpid			@12
-    npth_system				@13
-    npth_sigmask			@14
-    npth_sigwait			@15
-    npth_connect			@16
-    npth_accept				@17
-    npth_select				@18
-    npth_pselect			@19
-    npth_read				@20
-    npth_write				@21
-    npth_recvmsg			@22
-    npth_sendmsg			@23
+    npth_join				@2
+    npth_mutex_lock			@3
+    npth_mutex_timedlock		@4
+    npth_rwlock_rdlock			@5
+    npth_rwlock_timedrdlock		@6
+    npth_rwlock_wrlock			@7
+    npth_rwlock_timedwrlock		@8
+    npth_cond_wait			@9
+    npth_cond_timedwait			@10
+    npth_usleep				@11
+    npth_sleep				@12
+    npth_waitpid			@13
+    npth_system				@14
+    npth_sigmask			@15
+    npth_sigwait			@16
+    npth_connect			@17
+    npth_accept				@18
+    npth_select				@19
+    npth_pselect			@20
+    npth_read				@21
+    npth_write				@22
+    npth_recvmsg			@23
+    npth_sendmsg			@24
 
-    npth_sigev_init			@24
-    npth_sigev_add			@25
-    npth_sigev_fini			@26
-    npth_sigev_sigmask			@27
-    npth_sigev_get_pending		@28
+    npth_sigev_init			@25
+    npth_sigev_add			@26
+    npth_sigev_fini			@27
+    npth_sigev_sigmask			@28
+    npth_sigev_get_pending		@29
 
 ; END
 

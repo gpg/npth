@@ -43,10 +43,7 @@
    * Attributes are set by specific instead of generic getter/setter
    functions.
 
-   Offers replacement functions for sendmsg and recvmsg.
-
-   TODO: Don't make locks recursive by default.  Currently, the mutex
-   functions don't follow the pthread variants yet.  */
+   Offers replacement functions for sendmsg and recvmsg.  */
 
 #ifndef _NPTH_H
 #define _NPTH_H
@@ -120,7 +117,7 @@ int npth_init(void);
 
 /* pth_wait, pth_cancel, pth_abort, pth_raise */
 
-#define npth_join pthread_join
+int npth_join(npth_t thread, void **retval);
 #define npth_detach pthread_detach
 
 /* pth_exit */
@@ -197,33 +194,12 @@ int npth_init(void);
 #define npth_mutex_t pthread_mutex_t
 #define NPTH_MUTEX_INITIALIZER PTHREAD_MUTEX_INITIALIZER
 #define NPTH_RECURSIVE_MUTEX_INITIALIZER_NP PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP
-/* FIXME: Go away from recursive lock default.  */
 #define npth_mutex_init pthread_mutex_init
+#define npth_mutex_destroy pthread_mutex_destroy
 #define npth_mutex_trylock pthread_mutex_trylock
 
-int _npth_mutex_lock(npth_mutex_t *mutex);
-static inline int
-npth_mutex_lock(npth_mutex_t *mutex)
-{
-  /* No need to allow competing threads to enter when we can get the
-     lock immediately.  */
-  int err = npth_mutex_trylock (mutex);
-  if (err == EBUSY)
-    return _npth_mutex_lock (mutex);
-  return err;
-}
-
-int _npth_mutex_timedlock(npth_mutex_t *mutex, const struct timespec *abstime);
-static inline int
-npth_mutex_timedlock(npth_mutex_t *mutex, const struct timespec *abstime)
-{
-  /* No need to allow competing threads to enter when we can get the
-     lock immediately.  */
-  int err = npth_mutex_trylock (mutex);
-  if (err == EBUSY)
-    return _npth_mutex_timedlock (mutex, abstime);
-  return err;
-}
+int npth_mutex_lock(npth_mutex_t *mutex);
+int npth_mutex_timedlock(npth_mutex_t *mutex, const struct timespec *abstime);
 
 #define npth_mutex_unlock pthread_mutex_unlock
 
@@ -231,60 +207,19 @@ typedef pthread_rwlock_t npth_rwlock_t;
 #define NPTH_RWLOCK_INIT PTHREAD_RWLOCK_INITIALIZER
 /* For now, we don't support any rwlock attributes.  */
 #define npth_rwlock_init pthread_rwlock_init
+#define npth_rwlock_destroy pthread_rwlock_destroy
 #define npth_rwlock_tryrdlock pthread_rwlock_tryrdlock
 
-int _npth_rwlock_rdlock (npth_rwlock_t *rwlock);
-static inline int
-npth_rwlock_rdlock (npth_rwlock_t *rwlock)
-{
-  /* No need to allow competing threads to enter when we can get the
-     lock immediately.  */
-  int err = npth_rwlock_tryrdlock (rwlock);
-  if (err == EBUSY)
-    return _npth_rwlock_rdlock (rwlock);
-  return err;
-}
+int npth_rwlock_rdlock (npth_rwlock_t *rwlock);
 
-int _npth_rwlock_timedrdlock (npth_rwlock_t *rwlock,
-			      const struct timespec *abstime);
-static inline int
-npth_rwlock_timedrdlock (npth_rwlock_t *rwlock,
-			 const struct timespec *abstime)
-{
-  /* No need to allow competing threads to enter when we can get the
-     lock immediately.  */
-  int err = npth_rwlock_tryrdlock (rwlock);
-  if (err == EBUSY)
-    return _npth_rwlock_timedrdlock (rwlock, abstime);
-  return err;
-}
+int npth_rwlock_timedrdlock (npth_rwlock_t *rwlock,
+			     const struct timespec *abstime);
 
 #define npth_rwlock_trywrlock pthread_rwlock_trywrlock
-int _npth_rwlock_wrlock (npth_rwlock_t *rwlock);
-static inline int
-npth_rwlock_wrlock (npth_rwlock_t *rwlock)
-{
-  /* No need to allow competing threads to enter when we can get the
-     lock immediately.  */
-  int err = npth_rwlock_trywrlock (rwlock);
-  if (err == EBUSY)
-    return _npth_rwlock_wrlock (rwlock);
-  return err;
-}
-int _npth_rwlock_timedwrlock (npth_rwlock_t *rwlock,
-			      const struct timespec *abstime);
-static inline int
-npth_rwlock_timedwrlock (npth_rwlock_t *rwlock, const struct timespec *abstime)
-{
-  /* No need to allow competing threads to enter when we can get the
-     lock immediately.  */
-  int err = npth_rwlock_trywrlock (rwlock);
-  if (err == EBUSY)
-    return _npth_rwlock_timedwrlock (rwlock, abstime);
-  return err;
-}
+int npth_rwlock_wrlock (npth_rwlock_t *rwlock);
+int npth_rwlock_timedwrlock (npth_rwlock_t *rwlock,
+			     const struct timespec *abstime);
 #define npth_rwlock_unlock  pthread_rwlock_unlock
-#define npth_rwlock_destroy pthread_rwlock_destroy
 
 typedef pthread_cond_t npth_cond_t;
 #define NPTH_COND_INITIALIZER PTHREAD_COND_INITIALIZER

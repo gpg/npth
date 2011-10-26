@@ -38,7 +38,6 @@
 
 #include "npth.h"
 
-// #define TEST 1
 
 #include <stdio.h>
 #define DEBUG_CALLS 1
@@ -108,9 +107,34 @@ npth_init (void)
 
 
 int
-_npth_mutex_lock (npth_mutex_t *mutex)
+npth_join (npth_t thread, void **retval)
 {
   int err;
+
+  /* No need to allow competing threads to enter when we can get the
+     lock immediately.  */
+  err = pthread_tryjoin_np (thread, retval);
+  if (err != EBUSY)
+    return err;
+
+  ENTER();
+  err = pthread_join (thread, retval);
+  LEAVE();
+  return err;
+}
+
+
+
+int
+npth_mutex_lock (npth_mutex_t *mutex)
+{
+  int err;
+
+  /* No need to allow competing threads to enter when we can get the
+     lock immediately.  */
+  err = pthread_mutex_trylock (mutex);
+  if (err != EBUSY)
+    return err;
 
   ENTER();
   err = pthread_mutex_lock (mutex);
@@ -120,9 +144,15 @@ _npth_mutex_lock (npth_mutex_t *mutex)
 
 
 int
-_npth_mutex_timedlock (npth_mutex_t *mutex, const struct timespec *abstime)
+npth_mutex_timedlock (npth_mutex_t *mutex, const struct timespec *abstime)
 {
   int err;
+
+  /* No need to allow competing threads to enter when we can get the
+     lock immediately.  */
+  err = pthread_mutex_trylock (mutex);
+  if (err != EBUSY)
+    return err;
 
   ENTER();
   err = pthread_mutex_timedlock (mutex, abstime);
@@ -132,9 +162,15 @@ _npth_mutex_timedlock (npth_mutex_t *mutex, const struct timespec *abstime)
 
 
 int
-_npth_rwlock_rdlock (npth_rwlock_t *rwlock)
+npth_rwlock_rdlock (npth_rwlock_t *rwlock)
 {
   int err;
+
+  /* No need to allow competing threads to enter when we can get the
+     lock immediately.  */
+  err = pthread_rwlock_tryrdlock (rwlock);
+  if (err != EBUSY)
+    return err;
 
   ENTER();
   err = pthread_rwlock_rdlock (rwlock);
@@ -144,9 +180,15 @@ _npth_rwlock_rdlock (npth_rwlock_t *rwlock)
 
 
 int
-_npth_rwlock_timedrdlock (npth_rwlock_t *rwlock, const struct timespec *abstime)
+npth_rwlock_timedrdlock (npth_rwlock_t *rwlock, const struct timespec *abstime)
 {
   int err;
+
+  /* No need to allow competing threads to enter when we can get the
+     lock immediately.  */
+  err = pthread_rwlock_tryrdlock (rwlock);
+  if (err != EBUSY)
+    return err;
 
   ENTER();
   err = pthread_rwlock_timedrdlock (rwlock, abstime);
@@ -156,9 +198,15 @@ _npth_rwlock_timedrdlock (npth_rwlock_t *rwlock, const struct timespec *abstime)
 
 
 int
-_npth_rwlock_wrlock (npth_rwlock_t *rwlock)
+npth_rwlock_wrlock (npth_rwlock_t *rwlock)
 {
   int err;
+
+  /* No need to allow competing threads to enter when we can get the
+     lock immediately.  */
+  err = pthread_rwlock_trywrlock (rwlock);
+  if (err != EBUSY)
+    return err;
 
   ENTER();
   err = pthread_rwlock_wrlock (rwlock);
@@ -168,9 +216,15 @@ _npth_rwlock_wrlock (npth_rwlock_t *rwlock)
 
 
 int
-_npth_rwlock_timedwrlock (npth_rwlock_t *rwlock, const struct timespec *abstime)
+npth_rwlock_timedwrlock (npth_rwlock_t *rwlock, const struct timespec *abstime)
 {
   int err;
+
+  /* No need to allow competing threads to enter when we can get the
+     lock immediately.  */
+  err = pthread_rwlock_trywrlock (rwlock);
+  if (err != EBUSY)
+    return err;
 
   ENTER();
   err = pthread_rwlock_timedwrlock (rwlock, abstime);
@@ -338,15 +392,3 @@ npth_sendmsg (int fd, const struct msghdr *msg, int flags)
   LEAVE();
   return res;
 }
-
-
-#ifdef TEST
-int
-main (int argc, char *argv[])
-{
-  npth_mutex_t mutex;
-  npth_init ();
-
-  npth_mutex_init (&mutex);
-}
-#endif

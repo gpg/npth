@@ -23,12 +23,13 @@
 NPTH_1.0 {
   global:
     npth_init;
-    _npth_mutex_lock;
-    _npth_mutex_timedlock;
-    _npth_rwlock_rdlock;
-    _npth_rwlock_timedrdlock;
-    _npth_rwlock_wrlock;
-    _npth_rwlock_timedwrlock;
+    npth_join;
+    npth_mutex_lock;
+    npth_mutex_timedlock;
+    npth_rwlock_rdlock;
+    npth_rwlock_timedrdlock;
+    npth_rwlock_wrlock;
+    npth_rwlock_timedwrlock;
     npth_cond_wait;
     npth_cond_timedwait;
     npth_usleep;
