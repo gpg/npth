@@ -80,7 +80,10 @@ leave_npth (const char *function)
 {
   int res;
 
-  res = sem_wait (&sceptre);
+  do {
+    res = sem_wait (&sceptre);
+  } while (res < 0 && errno == EINTR);
+
   assert (!res);
 
   if (DEBUG_CALLS)
