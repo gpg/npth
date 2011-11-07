@@ -2,6 +2,19 @@
 
 	* src/npth.c (leave_npth): Loop over sem_wait on EINTR.
 
+2011-10-26  Marcus Brinkmann  <marcus@g10code.com>
+
+	* src/npth.h (npth_mutex_destroy): Add it.
+	(npth_join): Make it a proper function.
+	(_npth_mutex_lock, _npth_mutex_timedlock, _npth_rwlock_rdlock)
+	(_npth_rwlock_timedrdlock, _npth_rwlock_wrlock)
+	(_npth_rwlock_timedwrlock): Renamed to the variant without the
+	leading underscore.  There was no reason to have the static
+	function wrappers.
+	* src/npth.c: Corresponding changes here.
+	* src/npth.def: Also here.
+	* src/libnpth.vers: Likewise.
+
 2011-10-07  Marcus Brinkmann  <marcus@g10code.com>
 
 	* src/npth.h (npth_mutexattr_t, npth_mutexattr_init)
