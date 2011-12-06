@@ -21,7 +21,7 @@
 ACLOCAL_AMFLAGS = -I m4
 AUTOMAKE_OPTIONS = dist-bzip2 no-dist-gzip
 
-EXTRA_DIST = npth.spec.in autogen.sh
+EXTRA_DIST = npth.spec.in autogen.sh HACKING
 
 if RUN_TESTS
 tests = tests
@@ -33,8 +33,22 @@ SUBDIRS = src ${tests}
 
 # Fix the version of the spec file and create a file named VERSION
 # to be used for patch's Prereq: feature.
-dist-hook:
+dist-hook: gen-ChangeLog
 	@set -e; \
 	sed -e 's/@pkg_version@/$(VERSION)/g' \
 	    $(top_srcdir)/npth.spec.in  > $(distdir)/npth.spec
 	echo "$(VERSION)" > $(distdir)/VERSION
+
+
+gen_start_date = 2011-12-01T00:00:00
+.PHONY: gen-ChangeLog
+gen-ChangeLog:
+	if test -d $(top_srcdir)/.git; then				\
+	  (cd $(top_srcdir) &&                      			\
+	    ./build-aux/gitlog-to-changelog				\
+	    --amend=build-aux/git-log-fix				\
+	    --since=$(gen_start_date) ) > $(distdir)/cl-t;		\
+          cat $(top_srcdir)/build-aux/git-log-footer >> $(distdir)/cl-t;\
+	  rm -f $(distdir)/ChangeLog;					\
+	  mv $(distdir)/cl-t $(distdir)/ChangeLog;			\
+	fi
