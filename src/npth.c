@@ -109,6 +109,58 @@ npth_init (void)
 }
 
 
+struct startup_s
+{
+  void *(*start_routine) (void *);
+  void *arg;
+};
+
+
+static void *
+thread_start (void *startup_arg)
+{
+  struct startup_s *startup = startup_arg;
+  void *(*start_routine) (void *);
+  void *arg;
+  void *result;
+
+  start_routine = startup->start_routine;
+  arg = startup->arg;
+  free (startup);
+
+  LEAVE();
+  result = (*start_routine) (arg);
+  /* Note: instead of returning here, we might end up in
+     npth_exit() instead.  */
+  ENTER();
+
+  return result;
+}
+
+
+int
+npth_create (npth_t *thread, const npth_attr_t *attr,
+	     void *(*start_routine) (void *), void *arg)
+{
+  int err;
+  struct startup_s *startup;
+
+  startup = malloc (sizeof (*startup));
+  if (!startup)
+    return errno;
+
+  err = pthread_create (thread, attr, thread_start, arg);
+  if (err)
+    {
+      free (startup);
+      return err;
+    }
+
+  /* Memory is released in thread_start.  */
+  return 0;
+}
+
+
 int
 npth_join (npth_t thread, void **retval)
 {
@@ -126,6 +178,15 @@ npth_join (npth_t thread, void **retval)
   return err;
 }
 
+
+void
+npth_exit (void *retval)
+{
+  ENTER();
+  pthread_exit (retval);
+  /* Never reached.  But just in case pthread_exit does return... */
+  LEAVE();
+}
 
 
 int

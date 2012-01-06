@@ -98,7 +98,9 @@ int npth_init(void);
 
 #define npth_t pthread_t
 
-#define npth_create pthread_create
+int npth_create(npth_t *thread, const npth_attr_t *attr,
+		void *(*start_routine) (void *), void *arg);
+
 
 /* The Pth version of pth_once supports passing an argument, the
    pthread version does not.  We would have to reimplement the whole
@@ -120,7 +122,7 @@ int npth_init(void);
 int npth_join(npth_t thread, void **retval);
 #define npth_detach pthread_detach
 
-/* pth_exit */
+void npth_exit(void *retval);
 
 
 /* Utilities */
