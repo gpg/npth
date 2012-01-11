@@ -147,6 +147,7 @@ void npth_exit(void *retval);
 
 #define npth_key_t pthread_key_t
 #define npth_key_create pthread_key_create
+#define npth_key_delete pthread_key_delete
 #define npth_setspecific pthread_setspecific
 #define npth_getspecific pthread_getspecific
 
@@ -195,7 +196,10 @@ void npth_exit(void *retval);
 
 #define npth_mutex_t pthread_mutex_t
 #define NPTH_MUTEX_INITIALIZER PTHREAD_MUTEX_INITIALIZER
-#define NPTH_RECURSIVE_MUTEX_INITIALIZER_NP PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP
+#define NPTH_RECURSIVE_MUTEX_INITIALIZER_NP \
+  PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP
+#define NPTH_ERRORCHECK_MUTEX_INITIALIZER_NP \
+  PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP
 #define npth_mutex_init pthread_mutex_init
 #define npth_mutex_destroy pthread_mutex_destroy
 #define npth_mutex_trylock pthread_mutex_trylock
@@ -205,8 +209,33 @@ int npth_mutex_timedlock(npth_mutex_t *mutex, const struct timespec *abstime);
 
 #define npth_mutex_unlock pthread_mutex_unlock
 
+#define npth_rwlockattr_t pthread_rwlockattr_t
+#define npth_rwlockattr_init pthread_rwlockattr_init
+#define npth_rwlockattr_destroy pthread_rwlockattr_destroy
+#define npth_rwlockattr_gettype_np pthread_rwlockattr_gettype_np
+#define npth_rwlockattr_settype_np pthread_rwlockattr_settype_np
+#define NPTH_RWLOCK_PREFER_READER_NP PTHREAD_RWLOCK_PREFER_READER_NP
+/* Note: The prefer-writer setting is ineffective and the same as
+   prefer-reader.  This is because reader locks are specified to be
+   recursive, but for efficiency reasons we do not keep track of which
+   threads already hold a reader lock.  For this reason, we can not
+   prefer some reader locks over others, and thus a recursive reader
+   lock could be stalled by a pending writer, leading to a dead
+   lock.  */
+#define NPTH_RWLOCK_PREFER_WRITER_NP PTHREAD_RWLOCK_PREFER_WRITER_NP
+/* The non-recursive choise is a promise by the application that it
+   does not lock the rwlock for reading recursively.  In this setting,
+   writers are preferred, but note that recursive reader locking is
+   prone to deadlocks in that case.  */
+#define NPTH_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP \
+  PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP
+#define NPTH_RWLOCK_DEFAULT_NP PTHREAD_RWLOCK_DEFAULT_NP
+#define NPTH_RWLOCK_INITIALIZER PTHREAD_RWLOCK_INITIALIZER
+#define NPTH_RWLOCK_WRITER_NONRECURSIVE_INITIALIZER_NP \
+  PTHREAD_RWLOCK_WRITER_NONRECURSIVE_INITIALIZER_NP
+
 typedef pthread_rwlock_t npth_rwlock_t;
-#define NPTH_RWLOCK_INIT PTHREAD_RWLOCK_INITIALIZER
+#define NPTH_RWLOCK_INITIALIZER PTHREAD_RWLOCK_INITIALIZER
 /* For now, we don't support any rwlock attributes.  */
 #define npth_rwlock_init pthread_rwlock_init
 #define npth_rwlock_destroy pthread_rwlock_destroy
