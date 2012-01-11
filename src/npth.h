@@ -235,8 +235,6 @@ int npth_mutex_timedlock(npth_mutex_t *mutex, const struct timespec *abstime);
   PTHREAD_RWLOCK_WRITER_NONRECURSIVE_INITIALIZER_NP
 
 typedef pthread_rwlock_t npth_rwlock_t;
-#define NPTH_RWLOCK_INITIALIZER PTHREAD_RWLOCK_INITIALIZER
-/* For now, we don't support any rwlock attributes.  */
 #define npth_rwlock_init pthread_rwlock_init
 #define npth_rwlock_destroy pthread_rwlock_destroy
 #define npth_rwlock_tryrdlock pthread_rwlock_tryrdlock
