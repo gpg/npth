@@ -348,6 +348,18 @@ npth_sleep(unsigned int sec)
 }
 
 
+int
+npth_system(const char *cmd)
+{
+  int res;
+
+  ENTER();
+  res = system(cmd);
+  LEAVE();
+  return res;
+}
+
+
 pid_t
 npth_waitpid(pid_t pid, int *status, int options)
 {
