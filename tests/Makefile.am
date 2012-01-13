@@ -30,9 +30,15 @@
 
 TESTS = t-mutex
 
+if HAVE_W32_SYSTEM
+AM_CPPFLAGS = -I$(top_srcdir)/w32
+AM_LDFLAGS =
+LDADD = ../w32/libnpth.la
+else
 AM_CPPFLAGS = -pthread -I$(top_srcdir)/src
 AM_LDFLAGS = -pthread
 LDADD = ../src/libnpth.la
+endif
 
 noinst_HEADERS = t-support.h
 

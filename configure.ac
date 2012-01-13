@@ -150,11 +150,25 @@ AM_CONDITIONAL(HAVE_W64_SYSTEM, test "$have_w64_system" = yes)
 
 # Checks for libraries.
 
-have_pthread=no
-AC_CHECK_LIB(pthread,pthread_create,have_pthread=yes)
-if test "$have_pthread" = yes; then
-  AC_DEFINE(HAVE_PTHREAD, ,[Define if we have pthread.])
+if test "$have_w32_system" = no; then
+  have_pthread=no
+  AC_CHECK_LIB(pthread,pthread_create,have_pthread=yes)
+  if test "$have_pthread" = yes; then
+    AC_DEFINE(HAVE_PTHREAD, ,[Define if we have pthread.])
+  fi
 fi
+
+NETLIBS=
+if test "$have_w32_system" = yes; then
+   if test "$have_w32ce_system" = yes; then
+     NETLIBS="-lws2 $NETLIBS"
+   else
+     # FIXME: Check why we need to use ws2_32 and document that.
+     NETLIBS="-lws2_32 $NETLIBS"
+   fi
+fi
+AC_SUBST(NETLIBS)
+
 
 # Checks for header files.
 AC_CHECK_HEADERS([sys/socket.h])
@@ -193,14 +207,16 @@ AM_CONDITIONAL(RUN_TESTS, test "$run_tests" = "yes")
 
 # Last check.
 die=no
-if test "$have_pthread" = "no"; then
-   die=yes
-   AC_MSG_NOTICE([[
+if test "$have_w32_system" = no; then
+  if test "$have_pthread" = "no"; then
+     die=yes
+     AC_MSG_NOTICE([[
 ***
 *** You need Pthread to build this program.
 *** Normally, this library comes with your system.  On Windows, you can use:
 ***   http://sourceware.org/pthreads-win32/
 ***]])
+  fi
 fi
 
 if test "$die" = "yes"; then
@@ -214,6 +230,7 @@ fi
 # Checks for library functions.
 AC_CHECK_FUNCS([select])
 
-AC_CONFIG_FILES([Makefile src/Makefile tests/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile w32/Makefile tests/Makefile])
 AC_CONFIG_FILES(src/npth-config, chmod +x src/npth-config)
+AC_CONFIG_FILES(w32/npth-config, chmod +x w32/npth-config)
 AC_OUTPUT

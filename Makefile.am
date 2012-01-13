@@ -29,7 +29,13 @@ else
 tests =
 endif
 
-SUBDIRS = src ${tests}
+if HAVE_W32_SYSTEM
+npthdir = w32
+else
+npthdir = src
+endif
+
+SUBDIRS = ${npthdir} ${tests}
 
 # Fix the version of the spec file and create a file named VERSION
 # to be used for patch's Prereq: feature.
