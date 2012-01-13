@@ -28,8 +28,7 @@
 
 ## Process this file with automake to produce Makefile.in
 
-EXTRA_DIST = npth-config.in npth.m4 libnpth.vers \
-	     npth.def
+EXTRA_DIST = npth-config.in npth.m4 libnpth.vers
 #	     versioninfo.rc.in
 bin_SCRIPTS = npth-config
 m4datadir = $(datadir)/aclocal
