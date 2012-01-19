@@ -75,7 +75,7 @@ endif
 libnpth_la_LDFLAGS = $(no_undefined) $(export_symbols) \
 	-version-info \
 	@LIBNPTH_LT_CURRENT@:@LIBNPTH_LT_REVISION@:@LIBNPTH_LT_AGE@
-libnpth_la_DEPENDENCIES = $(srcdir)/libnpth.vers $(npth_deps)
+libnpth_la_DEPENDENCIES = $(npth_deps)
 libnpth_la_LIBADD = @NETLIBS@
 
 install-data-local: install-def-file
