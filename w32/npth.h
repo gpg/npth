@@ -170,6 +170,7 @@ int npth_sigwait(const sigset_t *set, int *sig);
 
 int npth_connect(int s, const struct sockaddr *addr, socklen_t addrlen);
 int npth_accept(int s, struct sockaddr *addr, socklen_t *addrlen);
+/* Only good for sockets!  */
 int npth_select(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
 		struct timeval *timeout);
 #if 0
@@ -177,6 +178,14 @@ int npth_select(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
 int npth_pselect(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
 		 const struct timespec *timeout, const sigset_t *sigmask);
 #endif
+/* Wait on the FDs (only good for sockets!) and the
+   INVALID_HANDLE_VALUE terminated list of extra events.  On return
+   (even on error), the bits in EVENTS_SET will contain the extra
+   events that occured (which means that there can only be up to 31
+   extra events).  */
+int npth_eselect(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
+		 const struct timespec *timeout, HANDLE *events, int *events_set);
+
 ssize_t npth_read(int fd, void *buf, size_t nbytes);
 ssize_t npth_write(int fd, const void *buf, size_t nbytes);
 int npth_recvmsg (int fd, struct msghdr *msg, int flags);

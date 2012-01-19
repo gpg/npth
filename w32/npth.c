@@ -1750,3 +1750,224 @@ npth_sendmsg (int fd, const struct msghdr *msg, int flags)
 {
   return EOPNOTSUPP;
 }
+
+
+/* Maximum number of extra handles.  We can only support 31 as that is
+   the number of bits we can return.  This is smaller than the maximum
+   number of allowed wait objects for WFMO (which is 64).  */
+#define MAX_EVENTS 31
+
+/* Using WFMO even for sockets makes Windows objects more composable,
+   which helps faking signals and other constructs, so we support
+   that.  You can still use npth_select for the plain select
+   function.  */
+int
+npth_eselect(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
+	     const struct timespec *timeout, HANDLE *events, int *events_set)
+{
+  int err = 0;
+  DWORD msecs;
+  int i;
+  /* One more for the handle associated with socket events.  */
+  HANDLE obj[MAX_EVENTS + 1];
+  int nr_obj = 0;
+  /* Number of extra events.  */
+  int nr_events = 0;
+  HANDLE sock_event = INVALID_HANDLE_VALUE;
+  /* This will be (nr_obj - 1) == nr_events.  */
+  int sock_event_idx = -1;
+  int res;
+  DWORD ret;
+  int fd;
+  int cnt;
+
+  /* We always ensure that the events_set is valid, even after an
+     error.  */
+  *events_set = 0;
+
+  if (timeout && (timeout->tv_sec < 0 || timeout->tv_nsec < 0))
+    {
+      errno = EINVAL;
+      return -1;
+    }
+
+  if (timeout == NULL)
+    msecs = INFINITE;
+  else if (timeout->tv_sec == 0 && timeout->tv_nsec == 0)
+    msecs = 0;
+  else
+    {
+      msecs = (timeout->tv_sec * 1000) + (timeout->tv_nsec + 999999) / 1000000;
+      if (msecs < 1)
+	msecs = 1;
+    }
+
+  /* Copy the extra handles.  */
+  for (i = 0; i < MAX_EVENTS; i++)
+    {
+      if (events[i] == INVALID_HANDLE_VALUE)
+	break;
+
+      obj[nr_obj] = events[i];
+      nr_obj++;
+      nr_events++;
+    }
+
+  /* We can only return the status of up to MAX_EVENTS handles in
+     EVENTS_SET.  */
+  if (events[i] != INVALID_HANDLE_VALUE)
+    {
+      errno = EINVAL;
+      return -1;
+    }
+
+  /* From here on, we clean up at err_out, and you can set ERR to return an error.  */
+
+  sock_event = WSACreateEvent ();
+  if (sock_event == INVALID_HANDLE_VALUE)
+    {
+      err = EINVAL;
+      return -1;
+    }
+
+  sock_event_idx = nr_obj;
+  obj[nr_obj] = sock_event;
+  nr_obj++;
+
+  for (fd = 0; fd < nfd; fd++)
+    {
+      int flags = 0;
+
+      if (FD_ISSET (fd, rfds))
+	flags |= FD_READ | FD_ACCEPT;
+      if (FD_ISSET (fd, wfds))
+	flags |= FD_WRITE;
+      if (FD_ISSET (fd, efds))
+	flags |= FD_OOB | FD_CLOSE;
+
+      if (!flags)
+	continue;
+
+      res = WSAEventSelect (fd, sock_event, flags);
+      if (res == SOCKET_ERROR)
+	{
+	  err = map_error (WSAGetLastError());
+	  goto err_out;
+	}
+    }
+
+  ENTER();
+  ret = WaitForMultipleObjects (nr_obj, obj, FALSE, msecs);
+  LEAVE();
+
+  if (ret == WAIT_TIMEOUT)
+    {
+      err = ETIMEDOUT;
+      goto err_out;
+    }
+  else if (ret == WAIT_FAILED)
+    {
+      err = map_error (GetLastError());
+      goto err_out;
+    }
+
+  /* All other return values: We look at the objects.  We must not
+     fail from here, because then we could lose events.  */
+
+  /* Keep track of result count.  */
+  cnt = 0;
+
+  for (i = 0; i < nr_events; i++)
+    {
+      ret = WaitForSingleObject (obj[i], 0);
+      if (ret != WAIT_OBJECT_0)
+	/* We ignore errors here.  */
+	continue;
+
+      *events_set = (*events_set) | (1 << i);
+      /* We consume the event here.  This may be undesirable, but
+	 unless we make it configurable we need a common policy, and
+	 this saves the user one step.  */
+      ResetEvent (obj[i]);
+      /* Increase result count.  */
+      cnt++;
+    }
+
+  /* Now check the file descriptors.  As we clear the fd sets here, we
+     also need to unbind them from the event here instead of relying
+     on the clean up routine at err_out.  */
+  FD_ZERO (rfds);
+  FD_ZERO (wfds);
+  FD_ZERO (efds);
+  for (fd = 0; fd < nfd; fd++)
+    {
+      int flags = 0;
+      WSANETWORKEVENTS ne;
+
+      if (FD_ISSET (fd, rfds))
+	flags |= FD_READ | FD_ACCEPT;
+      if (FD_ISSET (fd, wfds))
+	flags |= FD_WRITE;
+      if (FD_ISSET (fd, efds))
+	flags |= FD_OOB | FD_CLOSE;
+
+      if (!flags)
+	continue;
+
+      res = WSAEnumNetworkEvents (fd, NULL, &ne);
+      if (res == SOCKET_ERROR)
+	/* FIXME: We ignore this error here.  */
+	continue;
+
+      if ((flags & FD_READ)
+	  && (ne.lNetworkEvents & (FD_READ | FD_ACCEPT)))
+	{
+	  FD_SET (fd, rfds);
+	  cnt++;
+	}
+      if ((flags & FD_WRITE)
+	  && (ne.lNetworkEvents & FD_WRITE))
+	{
+	  FD_SET (fd, wfds);
+	  cnt++;
+	}
+      if ((flags & FD_CLOSE)
+	  && (ne.lNetworkEvents & (FD_OOB | FD_CLOSE)))
+	{
+	  FD_SET (fd, efds);
+	  cnt++;
+	}
+
+      /* We ignore errors.  */
+      WSAEventSelect (fd, NULL, 0);
+    }
+
+  /* We ignore errors.  */
+  WSACloseEvent (sock_event);
+
+  return cnt;
+
+  /* Cleanup.  */
+ err_out:
+  if (sock_event != INVALID_HANDLE_VALUE)
+    {
+      for (fd = 0; fd < nfd; fd++)
+	{
+	  int flags = 0;
+
+	  /* It is harmless to call this cleanup for file descriptors
+	     that did not get registered (for example, if there was an
+	     error while registering all FDs).  */
+	  if (FD_ISSET (fd, rfds)
+	      || FD_ISSET (fd, wfds)
+	      || FD_ISSET (fd, efds))
+	    /* We ignore errors.  */
+	    WSAEventSelect (fd, NULL, 0);
+	}
+      /* We ignore errors.  */
+      WSACloseEvent (sock_event);
+    }
+
+  errno = err;
+  return -1;
+}

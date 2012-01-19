@@ -77,5 +77,6 @@ EXPORTS
     npth_recvmsg			@56
     npth_sendmsg			@57
     npth_clock_gettime			@58
+    npth_eselect			@59
 
 ; END
