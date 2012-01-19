@@ -77,6 +77,7 @@ map_error (int winerr)
   return EIO;
 }
 
+
 static int
 wait_for_single_object (HANDLE obj, DWORD msecs)
 {
@@ -1209,7 +1210,23 @@ npth_cond_timedwait (npth_cond_t *cond, npth_mutex_t *mutex,
 
   err = calculate_timeout (abstime, &msecs);
   if (err)
-    return err;
+    {
+      if (err != ETIMEDOUT)
+	return err;
+
+      /* We have to give up the lock anyway to give others a chance to
+	 signal or broadcast.  */
+      err = npth_mutex_unlock (mutex);
+      if (err)
+	return err;
+      ENTER();
+      Sleep (0);
+      LEAVE();
+      err = npth_mutex_lock (mutex);
+      if (err)
+	return (err);
+      return ETIMEDOUT;
+    }
 
   /* While we are protected, let's check for a static initializer.  */
   err = cond_init_check (cond);
