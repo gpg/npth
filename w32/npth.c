@@ -1781,9 +1781,18 @@ npth_eselect(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
   int fd;
   int cnt;
 
-  /* We always ensure that the events_set is valid, even after an
-     error.  */
-  *events_set = 0;
+  if (events)
+    {
+      if (!events_set)
+	{
+	  errno = EINVAL;
+	  return -1;
+	}
+
+      /* We always ensure that the events_set is valid, even after an
+	 error.  */
+      *events_set = 0;
+    }
 
   if (timeout && (timeout->tv_sec < 0 || timeout->tv_nsec < 0))
     {
@@ -1802,15 +1811,18 @@ npth_eselect(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
 	msecs = 1;
     }
 
-  /* Copy the extra handles.  */
-  for (i = 0; i < MAX_EVENTS; i++)
+  if (events)
     {
-      if (events[i] == INVALID_HANDLE_VALUE)
-	break;
+      /* Copy the extra handles.  */
+      for (i = 0; i < MAX_EVENTS; i++)
+	{
+	  if (events[i] == INVALID_HANDLE_VALUE)
+	    break;
 
-      obj[nr_obj] = events[i];
-      nr_obj++;
-      nr_events++;
+	  obj[nr_obj] = events[i];
+	  nr_obj++;
+	  nr_events++;
+	}
     }
 
   /* We can only return the status of up to MAX_EVENTS handles in
@@ -1886,8 +1898,8 @@ npth_eselect(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
 
       *events_set = (*events_set) | (1 << i);
       /* We consume the event here.  This may be undesirable, but
-	 unless we make it configurable we need a common policy, and
-	 this saves the user one step.  */
+	 unless we make it configurable we need a common policy,
+	 and this saves the user one step.  */
       ResetEvent (obj[i]);
       /* Increase result count.  */
       cnt++;
