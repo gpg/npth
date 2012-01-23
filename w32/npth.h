@@ -191,6 +191,10 @@ ssize_t npth_write(int fd, const void *buf, size_t nbytes);
 int npth_recvmsg (int fd, struct msghdr *msg, int flags);
 int npth_sendmsg (int fd, const struct msghdr *msg, int flags);
 
+void npth_unprotect (void);
+void npth_protect (void);
+
+
 int npth_clock_gettime(struct timespec *tp);
 
 /* CMP may be ==, < or >.  Do not use <= or >=.  */

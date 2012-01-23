@@ -309,6 +309,11 @@ ssize_t npth_write(int fd, const void *buf, size_t nbytes);
 int npth_recvmsg (int fd, struct msghdr *msg, int flags);
 int npth_sendmsg (int fd, const struct msghdr *msg, int flags);
 
+/* For anything not covered here, you can enter/leave manually at your
+   own risk.  */
+void npth_unprotect (void);
+void npth_protect (void);
+
 
 /* Because the timed functions work on timespec, we provide a clock
    interface for convenience and portability.  FIXME: If the Timers

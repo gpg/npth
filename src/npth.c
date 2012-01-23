@@ -468,3 +468,17 @@ npth_sendmsg (int fd, const struct msghdr *msg, int flags)
   LEAVE();
   return res;
 }
+
+
+void
+npth_unprotect (void)
+{
+  ENTER();
+}
+
+
+void
+npth_protect (void)
+{
+  LEAVE();
+}

@@ -1751,6 +1751,20 @@ npth_sendmsg (int fd, const struct msghdr *msg, int flags)
   return EOPNOTSUPP;
 }
 
+
+void
+npth_unprotect (void)
+{
+  ENTER();
+}
+
+
+void
+npth_protect (void)
+{
+  LEAVE();
+}
+
 
 /* Maximum number of extra handles.  We can only support 31 as that is
    the number of bits we can return.  This is smaller than the maximum

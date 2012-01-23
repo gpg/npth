@@ -48,6 +48,8 @@ NPTH_1.0 {
     npth_write;
     npth_recvmsg;
     npth_sendmsg;
+    npth_unprotect;
+    npth_protect;
 
     npth_sigev_init;
     npth_sigev_add;

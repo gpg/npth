@@ -78,5 +78,7 @@ EXPORTS
     npth_sendmsg			@57
     npth_clock_gettime			@58
     npth_eselect			@59
+    npth_unprotect			@60
+    npth_protect			@61
 
 ; END
