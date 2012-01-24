@@ -51,7 +51,8 @@ gen_start_date = 2011-12-01T00:00:00
 gen-ChangeLog:
 	if test -d $(top_srcdir)/.git; then				\
 	  (cd $(top_srcdir) &&                      			\
-	    ./build-aux/gitlog-to-changelog				\
+	   gitlog-to-changelog						\
+	    --append-dot --tear-off					\
 	    --amend=build-aux/git-log-fix				\
 	    --since=$(gen_start_date) ) > $(distdir)/cl-t;		\
           cat $(top_srcdir)/build-aux/git-log-footer >> $(distdir)/cl-t;\
