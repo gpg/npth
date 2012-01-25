@@ -150,7 +150,9 @@ npth_create (npth_t *thread, const npth_attr_t *attr,
   if (!startup)
     return errno;
 
-  err = pthread_create (thread, attr, thread_start, arg);
+  startup->start_routine = start_routine;
+  startup->arg = arg;
+  err = pthread_create (thread, attr, thread_start, startup);
   if (err)
     {
       free (startup);
