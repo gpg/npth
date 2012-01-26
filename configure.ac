@@ -152,10 +152,12 @@ AM_CONDITIONAL(HAVE_W64_SYSTEM, test "$have_w64_system" = yes)
 
 if test "$have_w32_system" = no; then
   have_pthread=no
-  AC_CHECK_LIB(pthread,pthread_create,have_pthread=yes)
-  if test "$have_pthread" = yes; then
+  AC_CHECK_LIB(pthread, pthread_create)
+  if test "x$ac_cv_lib_pthread_pthread_create" = xyes; then
+    have_pthread=yes
     AC_DEFINE(HAVE_PTHREAD, ,[Define if we have pthread.])
   fi
+  AC_CHECK_FUNCS([pthread_tryjoin_np])
 fi
 
 NETLIBS=
@@ -191,6 +193,7 @@ AC_SUBST(BUILD_TIMESTAMP)
 AC_SUBST(BUILD_FILEVERSION)
 
 # Substitution used for npth-config
+# Fixme:  This should be based on the above tests.
 NPTH_CONFIG_LIBS="-lposix -lrt"
 NPTH_CONFIG_CFLAGS=""
 NPTH_CONFIG_HOST="$host"

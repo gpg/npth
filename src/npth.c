@@ -169,11 +169,13 @@ npth_join (npth_t thread, void **retval)
 {
   int err;
 
+#ifdef HAVE_PTHREAD_TRYJOIN_NP
   /* No need to allow competing threads to enter when we can get the
-     lock immediately.  */
+     lock immediately.  pthread_tryjoin_np is a GNU extension.  */
   err = pthread_tryjoin_np (thread, retval);
   if (err != EBUSY)
     return err;
+#endif /*HAVE_PTHREAD_TRYJOIN_NP*/
 
   ENTER();
   err = pthread_join (thread, retval);
