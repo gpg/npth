@@ -57,6 +57,9 @@ NPTH_1.0 {
     npth_sigev_sigmask;
     npth_sigev_get_pending;
 
+    npth_getname_np;
+    npth_setname_np;
+
   local:
     *;
 

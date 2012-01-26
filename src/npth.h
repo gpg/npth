@@ -68,6 +68,8 @@ extern "C" {
 
 /* Global Library Management */
 
+#define npth_t pthread_t
+
 /* Initialize the library and convert current thread to main thread.
    Must be first npth function called in a process.  Returns error
    number on error and 0 on success.  */
@@ -90,14 +92,11 @@ int npth_init(void);
 #define NPTH_CREATE_DETACHED PTHREAD_CREATE_DETACHED
 #define npth_attr_getdetachstate pthread_attr_getdetachstate
 #define npth_attr_setdetachstate pthread_attr_setdetachstate
-#define npth_getname_np pthread_getname_np
-#define npth_setname_np pthread_setname_np
+int npth_getname_np (npth_t target_thread, char *buf, size_t buflen);
+int npth_setname_np (npth_t target_thread, const char *name);
 
 
 /* Thread Control */
-
-#define npth_t pthread_t
-
 int npth_create(npth_t *thread, const npth_attr_t *attr,
 		void *(*start_routine) (void *), void *arg);
 

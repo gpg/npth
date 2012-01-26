@@ -157,7 +157,7 @@ if test "$have_w32_system" = no; then
     have_pthread=yes
     AC_DEFINE(HAVE_PTHREAD, ,[Define if we have pthread.])
   fi
-  AC_CHECK_FUNCS([pthread_tryjoin_np])
+  AC_CHECK_FUNCS([pthread_tryjoin_np pthread_setname_np pthread_getname_np])
 fi
 
 NETLIBS=

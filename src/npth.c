@@ -109,6 +109,34 @@ npth_init (void)
   return 0;
 }
 
+
+int
+npth_getname_np (npth_t target_thread, char *buf, size_t buflen)
+{
+#ifdef HAVE_PTHREAD_GETNAME_NP
+  return pthread_getname_np (target_thread, buf, buflen);
+#else
+  (void)target_thread;
+  (void)buf;
+  (void)buflen;
+  return ENOSYS;
+#endif
+}
+
+
+int
+npth_setname_np (npth_t target_thread, const char *name)
+{
+#ifdef HAVE_PTHREAD_SERNAME_NP
+  return pthread_settname_np (target_thread, name);
+#else
+  (void)target_thread;
+  (void)name;
+  return ENOSYS;
+#endif
+}
+
+
 
 struct startup_s
 {
