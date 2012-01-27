@@ -36,8 +36,6 @@ Options:
         [--host]
 	[--libs]
 	[--cflags]
-        [--get-gpg]
-        [--get-gpgsm]
 EOF
     exit $1
 }
@@ -109,7 +107,7 @@ while test $# -gt 0; do
             ;;
 	--libs)
             result=
-            for i in $libs "-lnpth"; do
+            for i in $libs; do
               skip=no
               case $i in
                   -L/usr/lib|-L/lib)

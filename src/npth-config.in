@@ -18,8 +18,8 @@ LC_ALL=C
 LANG=C
 
 # NPTH's own cflags and libs
-cflags="-I@includedir@"
-libs="-L@libdir@ -lpthread"
+cflags="-I@includedir@ @NPTH_CONFIG_CFLAGS@"
+libs="-L@libdir@ @NPTH_CONFIG_LIBS@"
 
 output=""
 
@@ -36,8 +36,6 @@ Options:
         [--host]
 	[--libs]
 	[--cflags]
-        [--get-gpg]
-        [--get-gpgsm]
 EOF
     exit $1
 }
@@ -109,7 +107,7 @@ while test $# -gt 0; do
             ;;
 	--libs)
             result=
-            for i in $libs "-lnpth"; do
+            for i in $libs ; do
               skip=no
               case $i in
                   -L/usr/lib|-L/lib)

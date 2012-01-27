@@ -94,10 +94,32 @@ AC_SUBST(VERSION)
 AC_DEFINE_UNQUOTED(PACKAGE, "$PACKAGE", [Name of this package])
 AC_DEFINE_UNQUOTED(VERSION, "$VERSION", [Version of this package])
 
+#
+# Generate values for the DLL version info
+#
+if test "$have_w32_system" = yes; then
+    BUILD_TIMESTAMP=`date --iso-8601=minutes`
+    changequote(,)dnl
+    BUILD_FILEVERSION=`echo "$VERSION" | sed 's/\([0-9.]*\).*/\1./;s/\./,/g'`
+    changequote([,])dnl
+    BUILD_FILEVERSION="${BUILD_FILEVERSION}${BUILD_REVISION}"
+fi
+AC_SUBST(BUILD_REVISION)
+AC_SUBST(BUILD_TIMESTAMP)
+AC_SUBST(BUILD_FILEVERSION)
+
+run_tests="yes"
+AC_ARG_ENABLE(tests,
+  AC_HELP_STRING([--disable-tests], [disable tests]),
+         run_tests=$enableval)
+AM_CONDITIONAL(RUN_TESTS, test "$run_tests" = "yes")
+
+
 # Don't default to build static libs.
 LT_PREREQ([2.2.6])
 LT_INIT([win32-dll disable-static])
 LT_LANG([Windows Resource])
+
 
 # For now we hardcode the use of version scripts.  It would be better
 # to write a test for this or even implement this within libtool.
@@ -116,9 +138,13 @@ esac
 
 AM_CONDITIONAL(HAVE_LD_VERSION_SCRIPT, test "$have_ld_version_script" = "yes")
 
+# Set some default values
+config_libs="-lnpth"
 have_w32_system=no
 have_w32ce_system=no
 have_w64_system=no
+
+# Define OS macros
 case "${host}" in
     x86_64-*mingw32*)
         have_w64_system=yes
@@ -148,16 +174,41 @@ if test "$have_w64_system" = yes; then
 fi
 AM_CONDITIONAL(HAVE_W64_SYSTEM, test "$have_w64_system" = yes)
 
-# Checks for libraries.
 
+#
+# Checks for header files.
+#
+AC_CHECK_HEADERS([sys/socket.h])
+
+#
+# Checks for typedefs, structures, and compiler characteristics.
+#
+AC_TYPE_PID_T
+AC_TYPE_SIZE_T
+AC_TYPE_SSIZE_T
+
+
+#
+# Checks for libraries and functions.
+#
 if test "$have_w32_system" = no; then
-  have_pthread=no
-  AC_CHECK_LIB(pthread, pthread_create)
-  if test "x$ac_cv_lib_pthread_pthread_create" = xyes; then
-    have_pthread=yes
-    AC_DEFINE(HAVE_PTHREAD, ,[Define if we have pthread.])
+  AC_SEARCH_LIBS([pthread_create],[pthread])
+  case "x$ac_cv_search_pthread_create" in
+    xno)
+      have_pthread=no
+      ;;
+    xnone\ required)
+      have_pthread=yes
+      ;;
+    *)
+      have_pthread=yes
+      config_libs="$config_libs $ac_cv_search_pthread_create"
+      ;;
+  esac
+  if test "$have_pthread" != no; then
+    AC_DEFINE(HAVE_PTHREAD,1,[Define if we have pthread.])
+    AC_CHECK_FUNCS([pthread_tryjoin_np pthread_setname_np pthread_getname_np])
   fi
-  AC_CHECK_FUNCS([pthread_tryjoin_np pthread_setname_np pthread_getname_np])
 fi
 
 NETLIBS=
@@ -171,30 +222,19 @@ if test "$have_w32_system" = yes; then
 fi
 AC_SUBST(NETLIBS)
 
+AC_CHECK_FUNCS([select])
 
-# Checks for header files.
-AC_CHECK_HEADERS([sys/socket.h])
-
-# Checks for typedefs, structures, and compiler characteristics.
-AC_TYPE_PID_T
-AC_TYPE_SIZE_T
-AC_TYPE_SSIZE_T
-
-# Generate values for the DLL version info
-if test "$have_w32_system" = yes; then
-    BUILD_TIMESTAMP=`date --iso-8601=minutes`
-    changequote(,)dnl
-    BUILD_FILEVERSION=`echo "$VERSION" | sed 's/\([0-9.]*\).*/\1./;s/\./,/g'`
-    changequote([,])dnl
-    BUILD_FILEVERSION="${BUILD_FILEVERSION}${BUILD_REVISION}"
+AC_SEARCH_LIBS([clock_gettime],[rt posix4])
+if test "x$ac_cv_search_clock_gettime" != no; then
+    AC_DEFINE(HAVE_CLOCK_GETTIME,1,
+              [Define to 1 if you have the `clock_gettime' function.])
 fi
-AC_SUBST(BUILD_REVISION)
-AC_SUBST(BUILD_TIMESTAMP)
-AC_SUBST(BUILD_FILEVERSION)
 
+
+#
 # Substitution used for npth-config
-# Fixme:  This should be based on the above tests.
-NPTH_CONFIG_LIBS="-lposix -lrt"
+#
+NPTH_CONFIG_LIBS="$config_libs"
 NPTH_CONFIG_CFLAGS=""
 NPTH_CONFIG_HOST="$host"
 AC_SUBST(NPTH_CONFIG_API_VERSION)
@@ -202,13 +242,9 @@ AC_SUBST(NPTH_CONFIG_LIBS)
 AC_SUBST(NPTH_CONFIG_CFLAGS)
 AC_SUBST(NPTH_CONFIG_HOST)
 
-run_tests="yes"
-AC_ARG_ENABLE(tests,
-  AC_HELP_STRING([--disable-tests], [disable tests]),
-         run_tests=$enableval)
-AM_CONDITIONAL(RUN_TESTS, test "$run_tests" = "yes")
-
+#
 # Last check.
+#
 die=no
 if test "$have_w32_system" = no; then
   if test "$have_pthread" = "no"; then
@@ -230,9 +266,9 @@ if test "$die" = "yes"; then
 ***]])
 fi
 
-# Checks for library functions.
-AC_CHECK_FUNCS([select])
-
+#
+# Write output
+#
 AC_CONFIG_FILES([Makefile src/Makefile w32/Makefile tests/Makefile])
 AC_CONFIG_FILES(src/npth-config, chmod +x src/npth-config)
 AC_CONFIG_FILES(w32/npth-config, chmod +x w32/npth-config)
