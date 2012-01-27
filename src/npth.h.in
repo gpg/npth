@@ -1,5 +1,5 @@
 /* npth.h - a lightweight implementation of pth over pthread.
-   Copyright (C) 2011 g10 Code GmbH
+   Copyright (C) 2011, 2012 g10 Code GmbH
 
    This file is part of NPTH.
 
@@ -52,6 +52,7 @@
 #include <sys/wait.h>
 #include <time.h>
 #include <sys/socket.h>
+#@INSERT_SYS_SELECT_H@
 
 #include <pthread.h>
 
@@ -400,3 +401,8 @@ int npth_sigev_get_pending (int *r_signum);
 }
 #endif
 #endif /*_NPTH_H*/
+/*
+@emacs_local_vars_begin@
+@emacs_local_vars_read_only@
+@emacs_local_vars_end@
+*/

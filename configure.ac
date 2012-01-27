@@ -67,7 +67,7 @@ BUILD_REVISION=m4_if(git_revision,[],[svn_revision],[git_brevis])
 PACKAGE=$PACKAGE_NAME
 VERSION=$PACKAGE_VERSION
 
-AC_CONFIG_SRCDIR([src/npth.h])
+AC_CONFIG_SRCDIR([src/npth.c])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
@@ -178,7 +178,14 @@ AM_CONDITIONAL(HAVE_W64_SYSTEM, test "$have_w64_system" = yes)
 #
 # Checks for header files.
 #
-AC_CHECK_HEADERS([sys/socket.h])
+# fixme: For what do we need the sys/socket test?
+AC_CHECK_HEADERS([sys/socket.h sys/select.h])
+INSERT_SYS_SELECT_H=
+if test x"$ac_cv_header_sys_select_h" = xyes; then
+  INSERT_SYS_SELECT_H="include <sys/select.h>"
+fi
+AC_SUBST(INSERT_SYS_SELECT_H)
+
 
 #
 # Checks for typedefs, structures, and compiler characteristics.
@@ -232,6 +239,14 @@ fi
 
 
 #
+# Substitutions to set generated files in a Emacs buffer to read-only.
+#
+AC_SUBST(emacs_local_vars_begin, ['Local Variables:'])
+AC_SUBST(emacs_local_vars_read_only, ['buffer-read-only: t'])
+AC_SUBST(emacs_local_vars_end, ['End:'])
+
+
+#
 # Substitution used for npth-config
 #
 NPTH_CONFIG_LIBS="$config_libs"
@@ -269,7 +284,11 @@ fi
 #
 # Write output
 #
-AC_CONFIG_FILES([Makefile src/Makefile w32/Makefile tests/Makefile])
+AC_CONFIG_FILES([Makefile
+src/npth.h
+src/Makefile
+w32/Makefile
+tests/Makefile])
 AC_CONFIG_FILES(src/npth-config, chmod +x src/npth-config)
 AC_CONFIG_FILES(w32/npth-config, chmod +x w32/npth-config)
 AC_OUTPUT
