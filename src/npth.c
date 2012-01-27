@@ -515,3 +515,15 @@ npth_protect (void)
 {
   LEAVE();
 }
+
+
+int
+npth_clock_gettime (struct timespec *ts)
+{
+#if HAVE_CLOCK_GETTIME
+  return clock_gettime (CLOCK_REALTIME, ts);
+#else
+  /* FIXME: fall back on time() with seconds resolution.  */
+# error clock_gettime not available - please provide a fallback.
+#endif
+}

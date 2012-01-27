@@ -313,10 +313,8 @@ void npth_protect (void);
 
 
 /* Because the timed functions work on timespec, we provide a clock
-   interface for convenience and portability.  FIXME: If the Timers
-   option is not supported, fall back on time() with seconds
-   resolution.  */
-#define npth_clock_gettime(ts) clock_gettime(CLOCK_REALTIME, ts)
+   interface for convenience and portability.  */
+int npth_clock_gettime (struct timespec *tp);
 
 /* CMP may be ==, < or >.  Do not use <= or >=.  */
 #define npth_timercmp(t1, t2, cmp)					\
