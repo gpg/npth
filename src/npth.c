@@ -61,6 +61,11 @@ static sem_t sceptre;
 
 static pthread_t main_thread;
 
+/* Systems that don't have pthread_mutex_timedlock get a busy wait
+   implementation that probes the lock every BUSY_WAIT_INTERVAL
+   milliseconds.  */
+#define BUSY_WAIT_INTERVAL 200
+
 
 static void
 enter_npth (const char *function)
@@ -252,7 +257,42 @@ npth_mutex_timedlock (npth_mutex_t *mutex, const struct timespec *abstime)
     return err;
 
   ENTER();
+
+#if HAVE_PTHREAD_MUTEX_TIMEDLOCK
   err = pthread_mutex_timedlock (mutex, abstime);
+#else
+  /* This is not great, but better than nothing.  Only works for locks
+     which are mostly uncontested.  Provides absolutely no fairness at
+     all.  Creates many wake-ups.  */
+  while (1)
+    {
+      struct timespec ts;
+      err = npth_clock_gettime (&ts);
+      if (err < 0)
+	{
+	  /* Just for safety make sure we return some error.  */
+	  err = errno ? errno : EINVAL;
+	  break;
+	}
+
+      if (! npth_timercmp (abstime, &ts, <))
+	{
+	  err = ETIMEDOUT;
+	  break;
+	}
+
+      err = pthread_mutex_trylock (mutex);
+      if (err != EBUSY)
+	break;
+
+      /* Try again after waiting a bit.  We could calculate the
+	 maximum wait time from ts and abstime, but we don't
+	 bother, as our granularity is pretty fine.  */
+      usleep (BUSY_WAIT_INTERVAL * 1000);
+    }
+
+#endif
+
   LEAVE();
   return err;
 }
