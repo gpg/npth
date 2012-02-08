@@ -35,7 +35,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/w32
 AM_LDFLAGS =
 LDADD = ../w32/libnpth.la
 else
-AM_CPPFLAGS = -I$(top_srcdir)/src
+AM_CPPFLAGS = -I../src
 AM_LDFLAGS =
 LDADD = ../src/libnpth.la
 endif
