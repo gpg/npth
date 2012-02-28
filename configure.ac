@@ -216,6 +216,9 @@ if test "$have_w32_system" = no; then
     AC_DEFINE(HAVE_PTHREAD,1,[Define if we have pthread.])
     AC_CHECK_FUNCS([pthread_tryjoin_np pthread_setname_np pthread_getname_np])
     AC_CHECK_FUNCS([pthread_mutex_timedlock])
+    AC_CHECK_FUNCS([pthread_rwlock_rdlock pthread_rwlock_wrlock])
+    AC_CHECK_FUNCS([pthread_rwlock_timedrdlock pthread_rwlock_timedwrlock])
+    AC_CHECK_FUNCS([pthread_rwlock_tryrdlock pthread_rwlock_trywrlock])
   fi
 fi
 

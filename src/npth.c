@@ -66,6 +66,47 @@ static pthread_t main_thread;
    milliseconds.  */
 #define BUSY_WAIT_INTERVAL 200
 
+typedef int (*trylock_func_t) (void *);
+
+static int
+busy_wait_for (trylock_func_t trylock, void *lock,
+	       const struct timespec *abstime)
+{
+  int err;
+
+  /* This is not great, but better than nothing.  Only works for locks
+     which are mostly uncontested.  Provides absolutely no fairness at
+     all.  Creates many wake-ups.  */
+  while (1)
+    {
+      struct timespec ts;
+      err = npth_clock_gettime (&ts);
+      if (err < 0)
+	{
+	  /* Just for safety make sure we return some error.  */
+	  err = errno ? errno : EINVAL;
+	  break;
+	}
+
+      if (! npth_timercmp (abstime, &ts, <))
+	{
+	  err = ETIMEDOUT;
+	  break;
+	}
+
+      err = (*trylock) (lock);
+      if (err != EBUSY)
+	break;
+
+      /* Try again after waiting a bit.  We could calculate the
+	 maximum wait time from ts and abstime, but we don't
+	 bother, as our granularity is pretty fine.  */
+      usleep (BUSY_WAIT_INTERVAL * 1000);
+    }
+
+  return err;
+}
+
 
 static void
 enter_npth (const char *function)
@@ -257,42 +298,11 @@ npth_mutex_timedlock (npth_mutex_t *mutex, const struct timespec *abstime)
     return err;
 
   ENTER();
-
 #if HAVE_PTHREAD_MUTEX_TIMEDLOCK
   err = pthread_mutex_timedlock (mutex, abstime);
 #else
-  /* This is not great, but better than nothing.  Only works for locks
-     which are mostly uncontested.  Provides absolutely no fairness at
-     all.  Creates many wake-ups.  */
-  while (1)
-    {
-      struct timespec ts;
-      err = npth_clock_gettime (&ts);
-      if (err < 0)
-	{
-	  /* Just for safety make sure we return some error.  */
-	  err = errno ? errno : EINVAL;
-	  break;
-	}
-
-      if (! npth_timercmp (abstime, &ts, <))
-	{
-	  err = ETIMEDOUT;
-	  break;
-	}
-
-      err = pthread_mutex_trylock (mutex);
-      if (err != EBUSY)
-	break;
-
-      /* Try again after waiting a bit.  We could calculate the
-	 maximum wait time from ts and abstime, but we don't
-	 bother, as our granularity is pretty fine.  */
-      usleep (BUSY_WAIT_INTERVAL * 1000);
-    }
-
+  err = busy_wait_for ((trylock_func_t) pthread_mutex_trylock, mutex, abstime);
 #endif
-
   LEAVE();
   return err;
 }
@@ -303,11 +313,13 @@ npth_rwlock_rdlock (npth_rwlock_t *rwlock)
 {
   int err;
 
+#ifdef HAVE_PTHREAD_RWLOCK_TRYRDLOCK
   /* No need to allow competing threads to enter when we can get the
      lock immediately.  */
   err = pthread_rwlock_tryrdlock (rwlock);
   if (err != EBUSY)
     return err;
+#endif
 
   ENTER();
   err = pthread_rwlock_rdlock (rwlock);
@@ -321,14 +333,21 @@ npth_rwlock_timedrdlock (npth_rwlock_t *rwlock, const struct timespec *abstime)
 {
   int err;
 
+#ifdef HAVE_PTHREAD_RWLOCK_TRYRDLOCK
   /* No need to allow competing threads to enter when we can get the
      lock immediately.  */
   err = pthread_rwlock_tryrdlock (rwlock);
   if (err != EBUSY)
     return err;
+#endif
 
   ENTER();
+#if HAVE_PTHREAD_RWLOCK_TIMEDRDLOCK
   err = pthread_rwlock_timedrdlock (rwlock, abstime);
+#else
+  err = busy_wait_for ((trylock_func_t) pthread_rwlock_tryrdlock, rwlock,
+		       abstime);
+#endif
   LEAVE();
   return err;
 }
@@ -339,11 +358,13 @@ npth_rwlock_wrlock (npth_rwlock_t *rwlock)
 {
   int err;
 
+#ifdef HAVE_PTHREAD_RWLOCK_TRYWRLOCK
   /* No need to allow competing threads to enter when we can get the
      lock immediately.  */
   err = pthread_rwlock_trywrlock (rwlock);
   if (err != EBUSY)
     return err;
+#endif
 
   ENTER();
   err = pthread_rwlock_wrlock (rwlock);
@@ -357,14 +378,21 @@ npth_rwlock_timedwrlock (npth_rwlock_t *rwlock, const struct timespec *abstime)
 {
   int err;
 
+#ifdef HAVE_PTHREAD_RWLOCK_TRYWRLOCK
   /* No need to allow competing threads to enter when we can get the
      lock immediately.  */
   err = pthread_rwlock_trywrlock (rwlock);
   if (err != EBUSY)
     return err;
+#endif
 
   ENTER();
+#if HAVE_PTHREAD_RWLOCK_TIMEDWRLOCK
   err = pthread_rwlock_timedwrlock (rwlock, abstime);
+#elif HAVE_PTHREAD_RWLOCK_TRYRDLOCK
+  err = busy_wait_for ((trylock_func_t) pthread_rwlock_trywrlock, rwlock,
+		       abstime);
+#endif
   LEAVE();
   return err;
 }
