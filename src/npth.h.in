@@ -110,7 +110,11 @@ int npth_create(npth_t *thread, const npth_attr_t *attr,
 /* No can do! */
 /* pth_suspend, pth_resume */
 
-#define npth_yield pthread_yield
+/* Yield is considered harmful and should never be used in high-level
+   applications.  Use a condition instead to wait for a specific event
+   to happen, or, as a last resort, use npth_usleep to back off a hard
+   busy wait.  */
+/* pth_yield */
 
 /* Not needed.  */
 /* pth_nap */

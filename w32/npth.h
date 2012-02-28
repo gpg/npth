@@ -85,8 +85,6 @@ int npth_create (npth_t *newthread, const npth_attr_t *attr,
 
 npth_t npth_self (void);
 
-int npth_yield (void);
-
 int npth_join (npth_t th, void **thread_return);
 int npth_detach (npth_t th);
 void npth_exit (void *retval);

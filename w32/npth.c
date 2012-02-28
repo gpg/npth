@@ -548,16 +548,6 @@ npth_self (void)
 }
 
 
-int
-npth_yield (void)
-{
-  ENTER();
-  Sleep (0);
-  LEAVE();
-  return 0;
-}
-
-
 /* Not part of the public interface at the moment, thus static.  */
 static int
 npth_tryjoin_np (npth_t thread_id, void **thread_return)
