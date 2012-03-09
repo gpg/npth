@@ -308,6 +308,7 @@ npth_mutex_timedlock (npth_mutex_t *mutex, const struct timespec *abstime)
 }
 
 
+#ifndef _NPTH_NO_RWLOCK
 int
 npth_rwlock_rdlock (npth_rwlock_t *rwlock)
 {
@@ -396,6 +397,7 @@ npth_rwlock_timedwrlock (npth_rwlock_t *rwlock, const struct timespec *abstime)
   LEAVE();
   return err;
 }
+#endif
 
 
 int
