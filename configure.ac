@@ -1,5 +1,5 @@
 # configure.ac                                          -*- Autoconf -*-
-# Copyright (C) 2011 g10 Code GmbH
+# Copyright (C) 2011, 2012 g10 Code GmbH
 # This file is part of NPTH.
 #
 # NPTH is free software; you can redistribute it and/or modify it
@@ -30,18 +30,28 @@
 AC_PREREQ([2.67])
 min_automake_version="1.11"
 
-# Version number: Remember to change it immediately *after* a release.
-#                 Make sure to pull the correct branch and run
-#                 "./autogen.sh --force"  before a "make dist".
-#                 See below for the LT versions.
-m4_define(my_version, [0.90])
-m4_define(my_issvn, [no])
+# To build a release you need to create a tag with the version number
+# (git tag -s npth-n.m) and run "./autogen.sh --force".  Please bump
+# the version number immediately after the release and do another
+# commit and push so that the git magic is able to work.
+# See below for the LT versions.
+m4_define(my_version, [0.91])
 
+# Below is m4 magic to extract and compute the git revision number,
+# the decimalized short revision number, a beta version string and a
+# flag indicating a development version (my_isgit). The latter works
+# by requiring the final tag in the repository.
 m4_define([git_revision], m4_esyscmd([git branch -v 2>/dev/null \
           | awk '/^\* / {printf "%s",$3}']))
-AC_INIT([npth],
-        [my_version[]m4_if(my_issvn,[yes],[-git[]git_revision])],
-        [gnupg-devel@gnupg.org])
+m4_define([git_revision_dec],
+          m4_esyscmd_s([echo $((0x$(echo ]git_revision[|head -c 4)))]))
+m4_define([git_betastring],
+          m4_esyscmd_s([git describe --match 'npth-[0-9].*[0-9]' --long|\
+                        awk -F- '$3!=0{print"-beta"$3}']))
+m4_define([my_isgit],m4_if(git_betastring,[],[no],[yes]))
+m4_define([my_full_version],[my_version[]git_betastring])
+
+AC_INIT([npth],[my_full_version],[gnupg-devel@gnupg.org])
 
 # LT Version numbers, remember to change them just *before* a release.
 #   (Code changed:			REVISION++)
@@ -57,8 +67,6 @@ LIBNPTH_LT_REVISION=1
 NPTH_CONFIG_API_VERSION=1
 ##############################################
 
-m4_define([git_brevis],m4_esyscmd(printf "%u" 0x[]m4_substr(git_revision,0,4)))
-BUILD_REVISION=m4_if(git_revision,[],[svn_revision],[git_brevis])
 PACKAGE=$PACKAGE_NAME
 VERSION=$PACKAGE_VERSION
 
@@ -88,20 +96,6 @@ AC_SUBST(PACKAGE)
 AC_SUBST(VERSION)
 AC_DEFINE_UNQUOTED(PACKAGE, "$PACKAGE", [Name of this package])
 AC_DEFINE_UNQUOTED(VERSION, "$VERSION", [Version of this package])
-
-#
-# Generate values for the DLL version info
-#
-if test "$have_w32_system" = yes; then
-    BUILD_TIMESTAMP=`date --iso-8601=minutes`
-    changequote(,)dnl
-    BUILD_FILEVERSION=`echo "$VERSION" | sed 's/\([0-9.]*\).*/\1./;s/\./,/g'`
-    changequote([,])dnl
-    BUILD_FILEVERSION="${BUILD_FILEVERSION}${BUILD_REVISION}"
-fi
-AC_SUBST(BUILD_REVISION)
-AC_SUBST(BUILD_TIMESTAMP)
-AC_SUBST(BUILD_FILEVERSION)
 
 run_tests="yes"
 AC_ARG_ENABLE(tests,
@@ -159,7 +153,6 @@ esac
 if test "$have_w32_system" = yes; then
    AC_DEFINE(HAVE_W32_SYSTEM,1,
              [Defined if we run on any kind of W32 API based system])
-   ACSUBST
 fi
 AM_CONDITIONAL(HAVE_W32_SYSTEM, test "$have_w32_system" = yes)
 
@@ -168,6 +161,21 @@ if test "$have_w64_system" = yes; then
              [Defined if we run on a 64 bit W32 API based system])
 fi
 AM_CONDITIONAL(HAVE_W64_SYSTEM, test "$have_w64_system" = yes)
+
+#
+# Generate values for the DLL version info
+#
+if test "$have_w32_system" = yes; then
+    BUILD_TIMESTAMP=`date --iso-8601=minutes`
+    BUILD_ISODATE=`date --iso-8601`
+    changequote(,)dnl
+    BUILD_FILEVERSION=`echo "$VERSION" | sed 's/\([0-9.]*\).*/\1./;s/\./,/g'`
+    changequote([,])dnl
+    BUILD_FILEVERSION="${BUILD_FILEVERSION}git_revision_dec"
+fi
+AC_SUBST(BUILD_TIMESTAMP)
+AC_SUBST(BUILD_ISODATE)
+AC_SUBST(BUILD_FILEVERSION)
 
 
 #
@@ -291,3 +299,10 @@ tests/Makefile])
 AC_CONFIG_FILES(src/npth-config, chmod +x src/npth-config)
 AC_CONFIG_FILES(w32/npth-config, chmod +x w32/npth-config)
 AC_OUTPUT
+
+echo "
+        $PACKAGE_NAME-$PACKAGE_VERSION prepared for make
+
+        Revision: git_revision  (git_revision_dec)
+        Platform: $host
+"
