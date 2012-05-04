@@ -31,16 +31,11 @@ AC_PREREQ([2.67])
 min_automake_version="1.11"
 
 # Version number: Remember to change it immediately *after* a release.
-#                 Make sure to run  "svn up" and "./autogen.sh --force"
-#                  before a "make dist".  See below for the LT versions.
-#
-# The SVN version is usually the next intended release version with
-# the string "-svnNNN" appended.  The reason for this is that tests for a
-# specific feature can already be done under the assumption that the
-# SVN version is the most recent one in a branch.  To disable the SVN
-# version for the real release, set the my_issvn macro to no.
-m4_define(my_version, [0.0])
-m4_define(my_issvn, [yes])
+#                 Make sure to pull the correct branch and run
+#                 "./autogen.sh --force"  before a "make dist".
+#                 See below for the LT versions.
+m4_define(my_version, [0.90])
+m4_define(my_issvn, [no])
 
 m4_define([git_revision], m4_esyscmd([git branch -v 2>/dev/null \
           | awk '/^\* / {printf "%s",$3}']))
@@ -56,7 +51,7 @@ AC_INIT([npth],
 #
 LIBNPTH_LT_CURRENT=0
 LIBNPTH_LT_AGE=0
-LIBNPTH_LT_REVISION=0
+LIBNPTH_LT_REVISION=1
 
 # If the API is changed in an incompatible way: increment the next counter.
 NPTH_CONFIG_API_VERSION=1

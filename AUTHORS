@@ -1,18 +1,54 @@
 Package: npth
+Download: ftp://ftp.gnupg.org/gcrypt/npth/
+Repository: git://git.gnupg.org/npth.git
 Maintainer: Marcus Brinkmann <marcus@g10code.com>
 Bug reports: gnupg-devel@gnupg.org
 Security related bug reports: security@gnupg.org
-License (software): LGPLv2.1+
+License (software): LGPLv3+/GPLv2+
 
-g10 Code GmbH <code@g10code.com>
- - Design and implementation.
+* Authors
 
- Copyright 2011 g10 Code GmbH
+  g10 Code GmbH <code@g10code.com>
+  - Design and implementation.
 
- This file is free software; as a special exception the author gives
- unlimited permission to copy and/or distribute it, with or without
- modifications, as long as this notice is preserved.
 
- This file is distributed in the hope that it will be useful, but
- WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
- implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+* Copyright
+
+  nPth is Copyright (C) 2011, 2012 g10 Code GmbH
+
+  nPth is free software; you can redistribute it and/or modify it
+  under the terms of either
+
+  - the GNU Lesser General Public License as published by the Free
+  Software Foundation; either version 3 of the License, or (at
+  your option) any later version.
+
+  or
+
+  - the GNU General Public License as published by the Free
+  Software Foundation; either version 2 of the License, or (at
+  your option) any later version.
+
+  or both in parallel, as here.
+
+  nPth is distributed in the hope that it will be useful, but WITHOUT
+  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+  License for more details.
+
+  You should have received a copies of the GNU General Public License
+  and the GNU Lesser General Public License along with this program;
+  if not, see <http://www.gnu.org/licenses/>.
+
+
+
+# This file is Copyright 2011, 2012 g10 Code GmbH
+#
+# This file is free software; as a special exception the author gives
+# unlimited permission to copy and/or distribute it, with or without
+# modifications, as long as this notice is preserved.
+#
+# This file is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

@@ -108,7 +108,7 @@ if [ "$myhost" = "w32" ]; then
           ;;
         *)
           [ -z "$w32root" ] && w32root="$HOME/w32root"
-          toolprefixes="i586-mingw32msvc i386-mingw32msvc"
+          toolprefixes="i586-mingw32msvc i386-mingw32msvc i686-w64-mingw32"
           ;;
     esac
     echo "Using $w32root as standard install directory" >&2
@@ -139,9 +139,7 @@ if [ "$myhost" = "w32" ]; then
     fi
 
     $tsdir/configure --enable-maintainer-mode  --prefix=${w32root}  \
-            --host=${host} --build=${build} \
-            --with-gpg-error-prefix=${w32root} \
-            --with-libassuan-prefix=${w32root} "$@"
+            --host=${host} --build=${build} "$@"
 
     exit $?
 fi
