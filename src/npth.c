@@ -55,14 +55,13 @@
 # endif
 #endif
 
-#define _npth_debug(x, ...) printf(__VA_ARGS__)
-
-
-#ifndef TEST
-#undef  DEBUG_CALLS
-#define DEBUG_CALLS 0
-#undef _npth_debug
-#define _npth_debug(x, ...)
+#ifdef TEST
+# define _npth_debug(x, ...) printf(__VA_ARGS__)
+#else
+# undef  DEBUG_CALLS
+# define DEBUG_CALLS 0
+# undef _npth_debug
+# define _npth_debug(x, ...)
 #endif
 
 /* The global lock that excludes all threads but one.  This is a
