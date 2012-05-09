@@ -163,9 +163,16 @@ npth_init (void)
   main_thread = pthread_self();
 
   /* The semaphore is not shared and binary.  */
-  sem_init(&sceptre, 0, 1);
+  res = sem_init(&sceptre, 0, 1);
   if (res < 0)
-    return errno;
+    {
+      /* POSIX.1-2001 defines the semaphore interface but does not
+         specify the return value for success.  Thus we better bail
+         out on error only on a POSIX.1-2008 system.  */
+#if _POSIX_C_SOURCE >= 200809L
+      return errno;
+#endif
+    }
 
   LEAVE();
   return 0;
