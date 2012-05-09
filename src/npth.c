@@ -36,6 +36,9 @@
 #include <errno.h>
 #include <pthread.h>
 #include <semaphore.h>
+#ifdef HAVE_UNISTD_H
+# include <unistd.h>
+#endif
 
 #include "npth.h"
 

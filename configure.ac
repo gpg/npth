@@ -182,7 +182,7 @@ AC_SUBST(BUILD_FILEVERSION)
 # Checks for header files.
 #
 # fixme: For what do we need the sys/socket test?
-AC_CHECK_HEADERS([sys/socket.h sys/select.h])
+AC_CHECK_HEADERS([sys/socket.h sys/select.h unistd.h])
 INSERT_SYS_SELECT_H=
 if test x"$ac_cv_header_sys_select_h" = xyes; then
   INSERT_SYS_SELECT_H="include <sys/select.h>"
