@@ -44,8 +44,19 @@
 
 
 #include <stdio.h>
+
 #define DEBUG_CALLS 1
+
+#if __STDC_VERSION__ < 199901L
+# if __GNUC__ >= 2
+#  define __func__ __FUNCTION__
+# else
+#  define __func__ "<unknown>"
+# endif
+#endif
+
 #define _npth_debug(x, ...) printf(__VA_ARGS__)
+
 
 #ifndef TEST
 #undef  DEBUG_CALLS
@@ -140,8 +151,9 @@ leave_npth (const char *function)
 		 function ? function : "");
 }
 
-#define ENTER() enter_npth(__FUNCTION__)
-#define LEAVE() leave_npth(__FUNCTION__)
+#define ENTER() enter_npth(__func__)
+#define LEAVE() leave_npth(__func__)
+
 
 int
 npth_init (void)
