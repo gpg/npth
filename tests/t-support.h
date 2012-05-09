@@ -1,29 +1,21 @@
 /* t-support.h - Helper routines for regression tests.
-   Copyright (C) 2011 g10 Code GmbH
+ * Copyright (C) 2011 g10 Code GmbH
+ *
+ * This file is free software; as a special exception the author gives
+ * unlimited permission to copy and/or distribute it, with or without
+ * modifications, as long as this notice is preserved.
+ *
+ * This file is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ */
 
-   This file is part of NPTH.
- 
-   NPTH is free software; you can redistribute it and/or modify it
-   under the terms of the GNU Lesser General Public License as
-   published by the Free Software Foundation; either version 2.1 of
-   the License, or (at your option) any later version.
-   
-   NPTH is distributed in the hope that it will be useful, but
-   WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-   
-   You should have received a copy of the GNU Lesser General Public
-   License along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-   02111-1307, USA.  */
-
-#include <unistd.h>
-#include <errno.h>
+#include <stdio.h>
 #include <stdlib.h>
-#include <locale.h>
+#include <string.h>
+#include <errno.h>
 
-#include <npth.h>
+#include "npth.h"
 
 #ifndef DIM
 #define DIM(v)		     (sizeof(v)/sizeof((v)[0]))
