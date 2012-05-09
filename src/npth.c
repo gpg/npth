@@ -39,6 +39,9 @@
 #ifdef HAVE_UNISTD_H
 # include <unistd.h>
 #endif
+#ifndef HAVE_PSELECT
+# include <signal.h>
+#endif
 
 #include "npth.h"
 
@@ -541,7 +544,54 @@ npth_pselect(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
   int res;
 
   ENTER();
-  res = pselect(nfd, rfds, wfds, efds, timeout, sigmask);
+#ifdef HAVE_PSELECT
+  res = pselect (nfd, rfds, wfds, efds, timeout, sigmask);
+#else /*!HAVE_PSELECT*/
+  {
+    /* A better emulation of pselect would be to create a pipe, wait
+       in the select for one end and have a signal handler write to
+       the other end.  However, this is non-trivial to implement and
+       thus we only print a compile time warning.  */
+#   ifdef __GNUC__
+#     warning Using a non race free pselect emulation.
+#   endif
+
+    struct timeval t, *tp;
+
+    tp = NULL;
+    if (!timeout)
+      ;
+    else if (timeout->tv_nsec >= 0 && timeout->tv_nsec < 1000000000)
+      {
+        t.tv_sec = timeout->tv_sec;
+        t.tv_usec = (timeout->tv_nsec + 999) / 1000;
+        tp = &t;
+      }
+    else
+      {
+        errno = EINVAL;
+        res = -1;
+        goto leave;
+      }
+
+    if (sigmask)
+      {
+        int save_errno;
+        sigset_t savemask;
+
+        pthread_sigmask (SIG_SETMASK, sigmask, &savemask);
+        res = select (nfd, rfds, wfds, efds, tp);
+        save_errno = errno;
+        pthread_sigmask (SIG_SETMASK, &savemask, NULL);
+        errno = save_errno;
+      }
+    else
+      res = select (nfd, rfds, wfds, efds, tp);
+
+  leave:
+    ;
+  }
+#endif /*!HAVE_PSELECT*/
   LEAVE();
   return res;
 }

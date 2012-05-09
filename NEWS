@@ -1,6 +1,14 @@
 Noteworthy changes in version 0.91 (unreleased)
 -----------------------------------------------
 
+ * Fixed a flaw in the initialization code.
+
+ * npth_init does now return an error on failure.
+
+ * Various fixes for better portability.
+
+ * Provide a pselect emulation for OpenBSD et al.
+
 
 Noteworthy changes in version 0.90 (2012-05-03)
 -----------------------------------------------

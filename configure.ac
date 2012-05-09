@@ -253,7 +253,7 @@ if test "$have_w32_system" = yes; then
 fi
 AC_SUBST(NETLIBS)
 
-AC_CHECK_FUNCS([select])
+AC_CHECK_FUNCS([select pselect])
 
 AC_SEARCH_LIBS([clock_gettime],[rt posix4])
 if test "x$ac_cv_search_clock_gettime" != no; then
