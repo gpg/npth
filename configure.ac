@@ -189,6 +189,23 @@ if test x"$ac_cv_header_sys_select_h" = xyes; then
 fi
 AC_SUBST(INSERT_SYS_SELECT_H)
 
+# Some systems lack socklen_t - provide a replacement.
+gl_TYPE_SOCKLEN_T
+case "${host}" in
+  *-*-mingw32*)
+    # socklen_t may or may not be defined depending on what headers
+    # are included.  To be safe we use int as this is the actual type.
+    INSERT_SOCKLEN_T="define _npth_socklen_t int"
+    ;;
+  *)
+    if test ".$gl_cv_socklen_t_equiv" = "."; then
+      INSERT_SOCKLEN_T="define _npth_socklen_t socklen_t"
+    else
+      INSERT_SOCKLEN_T="define _npth_socklen_t ${gl_cv_socklen_t_equiv}"
+    fi
+esac
+AC_SUBST(INSERT_SOCKLEN_T)
+
 
 #
 # Checks for typedefs, structures, and compiler characteristics.
