@@ -165,6 +165,7 @@ npth_init (void)
   /* The semaphore is not shared and binary.  */
   sem_init(&sceptre, 0, 1);
   if (res < 0)
+    return errno;
 
   LEAVE();
   return 0;
