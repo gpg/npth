@@ -1,4 +1,5 @@
-/* npth.h - a lightweight implementation of pth over pthread.
+/* npth-sigev.c - signal handling interface
+   Copyright (C) 2011 g10 Code GmbH
 
    This file is part of NPTH.
 
@@ -10,13 +11,13 @@
    your option) any later version.
 
    or
-   
+
    - the GNU General Public License as published by the Free
    Software Foundation; either version 2 of the License, or (at
    your option) any later version.
-    
+
    or both in parallel, as here.
- 
+
    NPTH is distributed in the hope that it will be useful, but WITHOUT
    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
