@@ -54,7 +54,11 @@
    owner, while a semaphore does not.)  */
 static sem_t sceptre;
 
-static pthread_t main_thread;
+/* The main thread is the active thread at the time pth_init was
+   called.  As of now it is only useful for debugging.  The volatile
+   make sure the compiler does not eliminate this set but not used
+   variable.  */
+static volatile pthread_t main_thread;
 
 /* Systems that don't have pthread_mutex_timedlock get a busy wait
    implementation that probes the lock every BUSY_WAIT_INTERVAL
