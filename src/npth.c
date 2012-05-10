@@ -394,6 +394,8 @@ npth_rwlock_timedwrlock (npth_rwlock_t *rwlock, const struct timespec *abstime)
 #elif HAVE_PTHREAD_RWLOCK_TRYRDLOCK
   err = busy_wait_for ((trylock_func_t) pthread_rwlock_trywrlock, rwlock,
 		       abstime);
+#else
+  err = ENOSYS;
 #endif
   LEAVE();
   return err;
