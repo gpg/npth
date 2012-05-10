@@ -46,27 +46,6 @@
 #include "npth.h"
 
 
-#include <stdio.h>
-
-#define DEBUG_CALLS 1
-
-#if __STDC_VERSION__ < 199901L
-# if __GNUC__ >= 2
-#  define __func__ __FUNCTION__
-# else
-#  define __func__ "<unknown>"
-# endif
-#endif
-
-#ifdef TEST
-# define _npth_debug(x, ...) printf(__VA_ARGS__)
-#else
-# undef  DEBUG_CALLS
-# define DEBUG_CALLS 0
-# undef _npth_debug
-# define _npth_debug(x, ...)
-#endif
-
 /* The global lock that excludes all threads but one.  This is a
    semaphore, because these can be safely used in a library even if
    the application or other libraries call fork(), including from a
@@ -125,20 +104,17 @@ busy_wait_for (trylock_func_t trylock, void *lock,
 
 
 static void
-enter_npth (const char *function)
+enter_npth (void)
 {
   int res;
 
-  if (DEBUG_CALLS)
-    _npth_debug (DEBUG_CALLS, "enter_npth (%s)\n",
-		 function ? function : "unknown");
   res = sem_post (&sceptre);
   assert (res == 0);
 }
 
 
 static void
-leave_npth (const char *function)
+leave_npth (void)
 {
   int res;
 
@@ -147,14 +123,10 @@ leave_npth (const char *function)
   } while (res < 0 && errno == EINTR);
 
   assert (!res);
-
-  if (DEBUG_CALLS)
-    _npth_debug (DEBUG_CALLS, "leave_npth (%s)\n",
-		 function ? function : "");
 }
 
-#define ENTER() enter_npth(__func__)
-#define LEAVE() leave_npth(__func__)
+#define ENTER() enter_npth ()
+#define LEAVE() leave_npth ()
 
 
 int
