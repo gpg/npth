@@ -198,8 +198,8 @@ npth_getname_np (npth_t target_thread, char *buf, size_t buflen)
 int
 npth_setname_np (npth_t target_thread, const char *name)
 {
-#ifdef HAVE_PTHREAD_SERNAME_NP
-  return pthread_settname_np (target_thread, name);
+#ifdef HAVE_PTHREAD_SETNAME_NP
+  return pthread_setname_np (target_thread, name);
 #else
   (void)target_thread;
   (void)name;
