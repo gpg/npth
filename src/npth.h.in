@@ -51,10 +51,12 @@
 
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <time.h>
+#@INSERT_SYS_TIME_H@
+#@INSERT_TIME_H@
 #include <sys/socket.h>
 #@INSERT_SOCKLEN_T@
 #@INSERT_SYS_SELECT_H@
+#@INSERT_SIGNAL_H@
 
 #include <pthread.h>
 

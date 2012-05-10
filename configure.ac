@@ -182,12 +182,29 @@ AC_SUBST(BUILD_FILEVERSION)
 # Checks for header files.
 #
 # fixme: For what do we need the sys/socket test?
-AC_CHECK_HEADERS([sys/socket.h sys/select.h unistd.h])
+AC_CHECK_HEADERS([sys/socket.h sys/select.h unistd.h sys/time.h time.h \
+                  signal.h])
 INSERT_SYS_SELECT_H=
 if test x"$ac_cv_header_sys_select_h" = xyes; then
   INSERT_SYS_SELECT_H="include <sys/select.h>"
 fi
 AC_SUBST(INSERT_SYS_SELECT_H)
+
+if test x"$ac_cv_header_sys_time_h" = xyes; then
+  INSERT_SYS_TIME_H="include <sys/time.h>"
+fi
+AC_SUBST(INSERT_SYS_TIME_H)
+
+if test x"$ac_cv_header_time_h" = xyes; then
+  INSERT_TIME_H="include <time.h>"
+fi
+AC_SUBST(INSERT_TIME_H)
+
+if test x"$ac_cv_header_signal_h" = xyes; then
+  INSERT_SIGNAL_H="include <signal.h>"
+fi
+AC_SUBST(INSERT_SIGNAL_H)
+
 
 # Some systems lack socklen_t - provide a replacement.
 gl_TYPE_SOCKLEN_T
