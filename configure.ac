@@ -259,7 +259,7 @@ if test "$have_w32_system" = no; then
   fi
 fi
 
-AC_CHECK_FUNCS([select pselect])
+AC_CHECK_FUNCS([select pselect gettimeofday])
 
 npth_LIBSOCKET
 config_libs="$config_libs $LIBSOCKET"

@@ -640,8 +640,18 @@ npth_protect (void)
 int
 npth_clock_gettime (struct timespec *ts)
 {
-#if HAVE_CLOCK_GETTIME
+#if defined(CLOCK_REALTIME) && HAVE_CLOCK_GETTIME
   return clock_gettime (CLOCK_REALTIME, ts);
+#elif HAVE_GETTIMEOFDAY
+  {
+    struct timeval tv;
+
+    if (gettimeofday (&tv, NULL))
+      return -1;
+    ts->tv_sec = tv.tv_sec;
+    ts->tv_nsec = tv.tv_usec * 1000;
+    return 0;
+  }
 #else
   /* FIXME: fall back on time() with seconds resolution.  */
 # error clock_gettime not available - please provide a fallback.
