@@ -242,18 +242,10 @@ if test "$have_w32_system" = no; then
   fi
 fi
 
-NETLIBS=
-if test "$have_w32_system" = yes; then
-   if test "$have_w32ce_system" = yes; then
-     NETLIBS="-lws2 $NETLIBS"
-   else
-     # FIXME: Check why we need to use ws2_32 and document that.
-     NETLIBS="-lws2_32 $NETLIBS"
-   fi
-fi
-AC_SUBST(NETLIBS)
-
 AC_CHECK_FUNCS([select pselect])
+
+npth_LIBSOCKET
+config_libs="$config_libs $LIBSOCKET"
 
 AC_SEARCH_LIBS([clock_gettime],[rt posix4])
 if test "x$ac_cv_search_clock_gettime" != no; then

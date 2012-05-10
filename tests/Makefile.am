@@ -39,7 +39,7 @@ LDADD = ../w32/libnpth.la
 else
 AM_CPPFLAGS = -I../src -D_POSIX_C_SOURCE=200112L
 AM_LDFLAGS =
-LDADD = ../src/libnpth.la
+LDADD = ../src/libnpth.la $(LIBSOCKET)
 endif
 
 noinst_HEADERS = t-support.h
