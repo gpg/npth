@@ -21,6 +21,9 @@
 #define DIM(v)		     (sizeof(v)/sizeof((v)[0]))
 #endif
 
+static int opt_verbose;
+
+
 #define fail_if_err(err)					\
   do								\
     {								\
@@ -31,4 +34,21 @@
           exit (1);						\
         }							\
     }								\
+  while (0)
+
+#define fail_msg(text)                                          \
+  do								\
+    {								\
+      fprintf (stderr, "%s:%d: %s\n",                           \
+               __FILE__, __LINE__, text);                       \
+      exit (1);                                                 \
+    }								\
+  while (0)
+
+#define info_msg(text)                          \
+  do                                            \
+    {                                           \
+      if (opt_verbose)                          \
+        fprintf (stderr, "%s\n", text);         \
+    }                                           \
   while (0)

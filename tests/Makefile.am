@@ -28,7 +28,7 @@
 
 ## Process this file with automake to produce Makefile.in
 
-TESTS = t-mutex
+TESTS = t-mutex t-thread
 
 # We explicitly require POSIX.1-2001 so that pthread_rwlock_t is
 # available when build with c99.
