@@ -26,8 +26,6 @@ AC_DEFUN([_AM_PATH_NPTH_CONFIG],
                sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\).*/\1/'`
   npth_version_minor=`echo $npth_version | \
                sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\).*/\2/'`
-  npth_version_micro=`echo $npth_version | \
-               sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\).*/\3/'`
 ])
 
 dnl AM_PATH_NPTH([MINIMUM-VERSION,
@@ -52,19 +50,15 @@ AC_DEFUN([AM_PATH_NPTH],
                sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\)/\1/'`
     req_minor=`echo $min_npth_version | \
                sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\)/\2/'`
-    req_micro=`echo $min_npth_version | \
-               sed 's/\([[0-9]]*\)\.\([[0-9]]*\)\.\([[0-9]]*\)/\3/'`
     if test "$npth_version_major" -gt "$req_major"; then
         ok=yes
-    else 
+    else
         if test "$npth_version_major" -eq "$req_major"; then
             if test "$npth_version_minor" -gt "$req_minor"; then
                ok=yes
             else
                if test "$npth_version_minor" -eq "$req_minor"; then
-                   if test "$npth_version_micro" -ge "$req_micro"; then
-                     ok=yes
-                   fi
+                  ok=yes
                fi
             fi
         fi
