@@ -175,7 +175,11 @@ int
 npth_setname_np (npth_t target_thread, const char *name)
 {
 #ifdef HAVE_PTHREAD_SETNAME_NP
+#ifdef __NetBSD__
+  return pthread_setname_np (target_thread, "%s", (void*) name);
+#else
   return pthread_setname_np (target_thread, name);
+#endif
 #else
   (void)target_thread;
   (void)name;
