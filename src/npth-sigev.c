@@ -126,6 +126,13 @@ npth_sigev_add (int signum)
 }
 
 
+static void
+restore_sigmask_for_child_process (void)
+{
+  pthread_sigmask (SIG_SETMASK, &sigev_unblock, NULL);
+}
+
+
 /* Finish the list of watched signals.  This starts to block them,
    too.  */
 void
@@ -133,6 +140,7 @@ npth_sigev_fini (void)
 {
   /* Block the interesting signals.  */
   pthread_sigmask (SIG_SETMASK, &sigev_block, NULL);
+  pthread_atfork (NULL, NULL, restore_sigmask_for_child_process);
 }
 
 
