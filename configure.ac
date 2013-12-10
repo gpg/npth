@@ -256,6 +256,7 @@ if test "$have_w32_system" = no; then
     AC_CHECK_FUNCS([pthread_rwlock_rdlock pthread_rwlock_wrlock])
     AC_CHECK_FUNCS([pthread_rwlock_timedrdlock pthread_rwlock_timedwrlock])
     AC_CHECK_FUNCS([pthread_rwlock_tryrdlock pthread_rwlock_trywrlock])
+    AC_CHECK_FUNCS([pthread_atfork])
   fi
 fi
 

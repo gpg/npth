@@ -126,12 +126,16 @@ npth_sigev_add (int signum)
 }
 
 
+#ifdef HAVE_PTHREAD_ATFORK
+/* There is non-POSIX operating system where fork is not available to
+   applications.  There, we have no pthread_atfork either.  In such a
+   case, we don't call pthread_atfork.  */
 static void
 restore_sigmask_for_child_process (void)
 {
   pthread_sigmask (SIG_SETMASK, &sigev_unblock, NULL);
 }
-
+#endif
 
 /* Finish the list of watched signals.  This starts to block them,
    too.  */
@@ -140,7 +144,9 @@ npth_sigev_fini (void)
 {
   /* Block the interesting signals.  */
   pthread_sigmask (SIG_SETMASK, &sigev_block, NULL);
+#ifdef HAVE_PTHREAD_ATFORK
   pthread_atfork (NULL, NULL, restore_sigmask_for_child_process);
+#endif
 }
 
 
