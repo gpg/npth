@@ -28,10 +28,7 @@
 
 ## Process this file with automake to produce Makefile.in
 
-EXTRA_DIST = npth-config.in npth.m4 npth.def
-bin_SCRIPTS = npth-config
-m4datadir = $(datadir)/aclocal
-m4data_DATA = npth.m4
+EXTRA_DIST = npth.def
 nodist_include_HEADERS = npth.h
 
 lib_LTLIBRARIES = libnpth.la

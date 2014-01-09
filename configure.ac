@@ -335,8 +335,7 @@ src/npth.h
 src/Makefile
 w32/Makefile
 tests/Makefile])
-AC_CONFIG_FILES(src/npth-config, chmod +x src/npth-config)
-AC_CONFIG_FILES(w32/npth-config, chmod +x w32/npth-config)
+AC_CONFIG_FILES(npth-config, chmod +x npth-config)
 AC_OUTPUT
 
 echo "
