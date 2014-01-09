@@ -79,6 +79,7 @@ AC_CANONICAL_HOST
 
 # Enable GNU extensions on systems that have them.
 AC_GNU_SOURCE
+AM_SILENT_RULES
 
 AH_VERBATIM([_REENTRANT],
 [#ifndef _REENTRANT
