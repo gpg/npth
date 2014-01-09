@@ -21,7 +21,7 @@
 ACLOCAL_AMFLAGS = -I m4
 AUTOMAKE_OPTIONS = dist-bzip2 no-dist-gzip
 
-EXTRA_DIST = npth-config.in npth.m4 npth.spec.in autogen.sh HACKING
+EXTRA_DIST = npth-config.in npth.m4 npth.spec.in autogen.sh autogen.rc HACKING
 bin_SCRIPTS = npth-config
 m4datadir = $(datadir)/aclocal
 m4data_DATA = npth.m4
