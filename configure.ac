@@ -273,6 +273,17 @@ fi
 
 
 #
+# Set NETLIBS
+#
+if test "$have_w32ce_system" = yes; then
+   NETLIBS="-lws2 $NETLIBS"
+elif test "$have_w32_system" = yes; then
+   NETLIBS="-lws2_32 $NETLIBS"
+fi
+AC_SUBST(NETLIBS)
+
+
+#
 # Substitutions to set generated files in a Emacs buffer to read-only.
 #
 AC_SUBST(emacs_local_vars_begin, [['Local][ ][Variables:']])

@@ -47,10 +47,14 @@ extern "C" {
 
 struct msghdr;
 
+/* At least with version 2 the mingw-w64 headers define timespec.  For
+   older compilers we keep our replacement.  */
+#if __MINGW64_VERSION_MAJOR < 2
 struct timespec {
   long tv_sec;                 /* seconds */
   long tv_nsec;                /* nanoseconds */
 };
+#endif /*__MINGW64_VERSION_MAJOR < 2*/
 
 /* These are new in MSVC 10.  */
 #ifndef ETIMEDOUT
