@@ -1854,11 +1854,11 @@ npth_eselect(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
     {
       int flags = 0;
 
-      if (FD_ISSET (fd, rfds))
+      if (rfds && FD_ISSET (fd, rfds))
 	flags |= FD_READ | FD_ACCEPT;
-      if (FD_ISSET (fd, wfds))
+      if (wfds && FD_ISSET (fd, wfds))
 	flags |= FD_WRITE;
-      if (FD_ISSET (fd, efds))
+      if (efds && FD_ISSET (fd, efds))
 	flags |= FD_OOB | FD_CLOSE;
 
       if (!flags)
@@ -1912,19 +1912,22 @@ npth_eselect(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
   /* Now check the file descriptors.  As we clear the fd sets here, we
      also need to unbind them from the event here instead of relying
      on the clean up routine at err_out.  */
-  FD_ZERO (rfds);
-  FD_ZERO (wfds);
-  FD_ZERO (efds);
+  if (rfds)
+    FD_ZERO (rfds);
+  if (wfds)
+    FD_ZERO (wfds);
+  if (efds)
+    FD_ZERO (efds);
   for (fd = 0; fd < nfd; fd++)
     {
       int flags = 0;
       WSANETWORKEVENTS ne;
 
-      if (FD_ISSET (fd, rfds))
+      if (rfds && FD_ISSET (fd, rfds))
 	flags |= FD_READ | FD_ACCEPT;
-      if (FD_ISSET (fd, wfds))
+      if (wfds && FD_ISSET (fd, wfds))
 	flags |= FD_WRITE;
-      if (FD_ISSET (fd, efds))
+      if (efds && FD_ISSET (fd, efds))
 	flags |= FD_OOB | FD_CLOSE;
 
       if (!flags)
@@ -1974,9 +1977,9 @@ npth_eselect(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
 	  /* It is harmless to call this cleanup for file descriptors
 	     that did not get registered (for example, if there was an
 	     error while registering all FDs).  */
-	  if (FD_ISSET (fd, rfds)
-	      || FD_ISSET (fd, wfds)
-	      || FD_ISSET (fd, efds))
+	  if ((rfds && FD_ISSET (fd, rfds))
+	      || (wfds && FD_ISSET (fd, wfds))
+	      || (efds && FD_ISSET (fd, efds)))
 	    /* We ignore errors.  */
 	    WSAEventSelect (fd, NULL, 0);
 	}
