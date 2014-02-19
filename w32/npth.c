@@ -1,5 +1,5 @@
 /* npth.c - a lightweight implementation of pth over pthread.
-   Copyright (C) 2011 g10 Code GmbH
+   Copyright (C) 2011, 2014 g10 Code GmbH
 
    This file is part of NPTH.
 
@@ -1761,6 +1761,12 @@ npth_protect (void)
    number of allowed wait objects for WFMO (which is 64).  */
 #define MAX_EVENTS 31
 
+/* Although the WSAEventSelect machinery seems to have no limit on the
+   number of selectable fds, we impose the same limit as used by
+   traditional select.  This allows us to work with a static data
+   structure instead of an dynamically allocated array.  */
+#define MAX_FDOBJS FD_SETSIZE
+
 /* Using WFMO even for sockets makes Windows objects more composable,
    which helps faking signals and other constructs, so we support
    that.  You can still use npth_select for the plain select
@@ -1772,6 +1778,7 @@ npth_eselect(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
   int err = 0;
   DWORD msecs;
   int i;
+  u_int idx;
   /* One more for the handle associated with socket events.  */
   HANDLE obj[MAX_EVENTS + 1];
   int nr_obj = 0;
@@ -1782,8 +1789,16 @@ npth_eselect(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
   int sock_event_idx = -1;
   int res;
   DWORD ret;
-  int fd;
+  SOCKET fd;
+  long flags;
   int cnt;
+  struct {
+    SOCKET fd;
+    long flags;
+  } fdobj[MAX_FDOBJS];
+  int nr_fdobj = 0;
+
+  (void)nfd;  /* No need for it under Windows.  */
 
   if (events)
     {
@@ -1813,6 +1828,7 @@ npth_eselect(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
       msecs = (timeout->tv_sec * 1000) + (timeout->tv_nsec + 999999) / 1000000;
       if (msecs < 1)
 	msecs = 1;
+      fprintf (stderr,"eselect timeout is %ums\n", (unsigned int)msecs);
     }
 
   if (events)
@@ -1837,7 +1853,8 @@ npth_eselect(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
       return -1;
     }
 
-  /* From here on, we clean up at err_out, and you can set ERR to return an error.  */
+  /* From here on, we clean up at err_out, and you can set ERR to
+     return an error.  */
 
   sock_event = WSACreateEvent ();
   if (sock_event == INVALID_HANDLE_VALUE)
@@ -1850,21 +1867,43 @@ npth_eselect(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
   obj[nr_obj] = sock_event;
   nr_obj++;
 
-  for (fd = 0; fd < nfd; fd++)
+  /* Combine FDs from all lists.  */
+#define SET_FDOBJ(x,v) do {                      \
+    for (idx=0; idx < (x)->fd_count; idx++)      \
+      {                                          \
+        for (i=0; i < nr_fdobj; i++)             \
+          if (fdobj[i].fd == (x)->fd_array[idx]) \
+            break;                               \
+        if (i < nr_fdobj)                        \
+          ;                                      \
+        else if (nr_fdobj < MAX_FDOBJS)          \
+          {                                      \
+            i = nr_fdobj++;                      \
+            fdobj[i].fd    = (x)->fd_array[idx]; \
+            fdobj[i].flags = 0;                  \
+          }                                      \
+        else                                     \
+          {                                      \
+            err = EINVAL;                        \
+            goto err_out;                        \
+          }                                      \
+        fdobj[i].flags |= (v);                   \
+      }                                          \
+  } while (0)
+
+  if (rfds)
+    SET_FDOBJ (rfds, FD_READ | FD_ACCEPT);
+  if (wfds)
+    SET_FDOBJ (wfds, FD_WRITE);
+  if (efds)
+    SET_FDOBJ (efds, FD_OOB | FD_CLOSE);
+
+#undef SET_FDOBJ
+
+  /* Set the select flags.  */
+  for (i = 0; i < nr_fdobj; i++)
     {
-      int flags = 0;
-
-      if (rfds && FD_ISSET (fd, rfds))
-	flags |= FD_READ | FD_ACCEPT;
-      if (wfds && FD_ISSET (fd, wfds))
-	flags |= FD_WRITE;
-      if (efds && FD_ISSET (fd, efds))
-	flags |= FD_OOB | FD_CLOSE;
-
-      if (!flags)
-	continue;
-
-      res = WSAEventSelect (fd, sock_event, flags);
+      res = WSAEventSelect (fdobj[i].fd, sock_event, fdobj[i].flags);
       if (res == SOCKET_ERROR)
 	{
 	  err = map_error (WSAGetLastError());
@@ -1872,10 +1911,11 @@ npth_eselect(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
 	}
     }
 
+  /* Let's wait.  */
   ENTER();
   ret = WaitForMultipleObjects (nr_obj, obj, FALSE, msecs);
   LEAVE();
-
+  fprintf (stderr, "WFMO returned: %u\n", (unsigned int)ret);
   if (ret == WAIT_TIMEOUT)
     {
       err = ETIMEDOUT;
@@ -1909,56 +1949,42 @@ npth_eselect(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
       cnt++;
     }
 
-  /* Now check the file descriptors.  As we clear the fd sets here, we
-     also need to unbind them from the event here instead of relying
-     on the clean up routine at err_out.  */
+  /* Now update the file descriptors sets.  */
   if (rfds)
     FD_ZERO (rfds);
   if (wfds)
     FD_ZERO (wfds);
   if (efds)
     FD_ZERO (efds);
-  for (fd = 0; fd < nfd; fd++)
+  for (i = 0; i < nr_fdobj; i++)
     {
-      int flags = 0;
       WSANETWORKEVENTS ne;
 
-      if (rfds && FD_ISSET (fd, rfds))
-	flags |= FD_READ | FD_ACCEPT;
-      if (wfds && FD_ISSET (fd, wfds))
-	flags |= FD_WRITE;
-      if (efds && FD_ISSET (fd, efds))
-	flags |= FD_OOB | FD_CLOSE;
-
-      if (!flags)
-	continue;
+      fd = fdobj[i].fd;
+      flags = fdobj[i].flags;
 
       res = WSAEnumNetworkEvents (fd, NULL, &ne);
       if (res == SOCKET_ERROR)
-	/* FIXME: We ignore this error here.  */
-	continue;
+	continue; /* FIXME: We ignore this error here.  */
 
-      if ((flags & FD_READ)
-	  && (ne.lNetworkEvents & (FD_READ | FD_ACCEPT)))
+      /* NB that the test on FLAGS guarantees that ?fds is not NULL. */
+      if ((flags & FD_READ) && (ne.lNetworkEvents & (FD_READ | FD_ACCEPT)))
 	{
 	  FD_SET (fd, rfds);
 	  cnt++;
 	}
-      if ((flags & FD_WRITE)
-	  && (ne.lNetworkEvents & FD_WRITE))
+      if ((flags & FD_WRITE) && (ne.lNetworkEvents & FD_WRITE))
 	{
 	  FD_SET (fd, wfds);
 	  cnt++;
 	}
-      if ((flags & FD_CLOSE)
-	  && (ne.lNetworkEvents & (FD_OOB | FD_CLOSE)))
+      if ((flags & FD_CLOSE) && (ne.lNetworkEvents & (FD_OOB | FD_CLOSE)))
 	{
 	  FD_SET (fd, efds);
 	  cnt++;
 	}
 
-      /* We ignore errors.  */
-      WSAEventSelect (fd, NULL, 0);
+      WSAEventSelect (fd, NULL, 0); /* We ignore errors.  */
     }
 
   /* We ignore errors.  */
@@ -1970,21 +1996,11 @@ npth_eselect(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
  err_out:
   if (sock_event != INVALID_HANDLE_VALUE)
     {
-      for (fd = 0; fd < nfd; fd++)
+      for (i = 0; i < nr_fdobj; i++)
 	{
-	  int flags = 0;
-
-	  /* It is harmless to call this cleanup for file descriptors
-	     that did not get registered (for example, if there was an
-	     error while registering all FDs).  */
-	  if ((rfds && FD_ISSET (fd, rfds))
-	      || (wfds && FD_ISSET (fd, wfds))
-	      || (efds && FD_ISSET (fd, efds)))
-	    /* We ignore errors.  */
-	    WSAEventSelect (fd, NULL, 0);
+          WSAEventSelect (fdobj[i].fd, NULL, 0); /* We ignore errors.  */
 	}
-      /* We ignore errors.  */
-      WSACloseEvent (sock_event);
+      WSACloseEvent (sock_event); /* We ignore errors.  */
     }
 
   errno = err;
