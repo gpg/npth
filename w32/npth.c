@@ -1828,7 +1828,6 @@ npth_eselect(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
       msecs = (timeout->tv_sec * 1000) + (timeout->tv_nsec + 999999) / 1000000;
       if (msecs < 1)
 	msecs = 1;
-      fprintf (stderr,"eselect timeout is %ums\n", (unsigned int)msecs);
     }
 
   if (events)
@@ -2002,6 +2001,9 @@ npth_eselect(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
 	}
       WSACloseEvent (sock_event); /* We ignore errors.  */
     }
+
+  if (err == ETIMEDOUT)
+    return 0;
 
   errno = err;
   return -1;

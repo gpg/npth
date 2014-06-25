@@ -56,13 +56,14 @@ struct timespec {
 };
 #endif /*__MINGW64_VERSION_MAJOR < 2*/
 
-/* These are new in MSVC 10.  */
+
 #ifndef ETIMEDOUT
-#define ETIMEDOUT 138
+#define ETIMEDOUT 10060  /* This is WSAETIMEDOUT.  */
 #endif
 #ifndef EOPNOTSUPP
-#define EOPNOTSUPP 130
+#define EOPNOTSUPP 10045 /* This is WSAEOPNOTSUPP.  */
 #endif
+
 
 int npth_init (void);
 
