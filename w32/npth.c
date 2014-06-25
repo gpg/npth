@@ -1915,7 +1915,6 @@ npth_eselect(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
   ENTER();
   ret = WaitForMultipleObjects (nr_obj, obj, FALSE, msecs);
   LEAVE();
-  fprintf (stderr, "WFMO returned: %u\n", (unsigned int)ret);
   if (ret == WAIT_TIMEOUT)
     {
       err = ETIMEDOUT;
