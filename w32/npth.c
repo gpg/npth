@@ -1843,14 +1843,14 @@ npth_eselect(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
 	  nr_obj++;
 	  nr_events++;
 	}
-    }
 
-  /* We can only return the status of up to MAX_EVENTS handles in
-     EVENTS_SET.  */
-  if (events[i] != INVALID_HANDLE_VALUE)
-    {
-      errno = EINVAL;
-      return -1;
+      /* We can only return the status of up to MAX_EVENTS handles in
+         EVENTS_SET.  */
+      if (events[i] != INVALID_HANDLE_VALUE)
+        {
+          errno = EINVAL;
+          return -1;
+        }
     }
 
   /* From here on, we clean up at err_out, and you can set ERR to
