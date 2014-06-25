@@ -1773,7 +1773,8 @@ npth_protect (void)
    function.  */
 int
 npth_eselect(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
-	     const struct timespec *timeout, HANDLE *events, int *events_set)
+	     const struct timespec *timeout,
+             HANDLE *events, unsigned int *events_set)
 {
   int err = 0;
   DWORD msecs;

@@ -187,7 +187,8 @@ int npth_pselect(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
    events that occured (which means that there can only be up to 31
    extra events).  */
 int npth_eselect(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
-		 const struct timespec *timeout, HANDLE *events, int *events_set);
+		 const struct timespec *timeout,
+                 HANDLE *events, unsigned int *events_set);
 
 ssize_t npth_read(int fd, void *buf, size_t nbytes);
 ssize_t npth_write(int fd, const void *buf, size_t nbytes);
