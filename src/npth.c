@@ -128,12 +128,14 @@ static void
 leave_npth (void)
 {
   int res;
+  int save_errno = errno;
 
   do {
     res = sem_wait (sceptre);
   } while (res < 0 && errno == EINTR);
 
   assert (!res);
+  errno = save_errno;
 }
 
 #define ENTER() enter_npth ()

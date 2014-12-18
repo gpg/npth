@@ -1,6 +1,8 @@
 Noteworthy changes in version 1.2 (unreleased)
 ----------------------------------------------
 
+ * Fix possible clobbering of ERRNO.
+
 
 Noteworthy changes in version 1.1 (2014-10-31)
 ----------------------------------------------
