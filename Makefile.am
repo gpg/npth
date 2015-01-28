@@ -19,7 +19,6 @@
 ## Process this file with automake to produce Makefile.in
 
 ACLOCAL_AMFLAGS = -I m4
-AUTOMAKE_OPTIONS = dist-bzip2 no-dist-gzip
 
 EXTRA_DIST = npth-config.in npth.m4 npth.spec.in autogen.sh autogen.rc HACKING
 bin_SCRIPTS = npth-config

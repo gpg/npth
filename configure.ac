@@ -28,7 +28,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.67])
-min_automake_version="1.11"
+min_automake_version="1.14"
 
 # To build a release you need to create a tag with the version number
 # (git tag -s npth-n.m) and run "./autogen.sh --force".  Please bump
@@ -74,7 +74,7 @@ AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_SRCDIR([src/npth.c])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
-AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
+AM_INIT_AUTOMAKE([serial-tests dist-bzip2 no-dist-gzip])
 AM_MAINTAINER_MODE
 AC_CANONICAL_HOST
 AM_SILENT_RULES
