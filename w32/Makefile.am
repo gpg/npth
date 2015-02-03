@@ -28,6 +28,8 @@
 
 ## Process this file with automake to produce Makefile.in
 
+# Note: This directory is only used for W32
+
 EXTRA_DIST = npth.def
 nodist_include_HEADERS = npth.h
 
@@ -38,7 +40,6 @@ libnpth_la_SOURCES = npth.h npth.c
 # AM_CPPFLAGS =
 # AM_CFLAGS =
 
-if HAVE_W32_SYSTEM
 RCCOMPILE = $(RC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES)
 LTRCCOMPILE = $(LIBTOOL) --mode=compile --tag=RC $(RCCOMPILE)
 
@@ -50,6 +51,7 @@ SUFFIXES = .rc .lo
 npth_res = versioninfo.lo
 no_undefined = -no-undefined
 export_symbols = -export-symbols $(srcdir)/npth.def
+extra_ltoptions = -XCClinker -static-libgcc
 
 install-def-file:
 	$(INSTALL) $(srcdir)/npth.def $(DESTDIR)$(libdir)/npth.def
@@ -59,17 +61,8 @@ uninstall-def-file:
 
 gpgme_deps = $(gpgme_res) npth.def
 
-else
-npth_res =
-no_undefined =
-export_symbols =
-install-def-file:
-uninstall-def-file:
 
-npth_deps =
-endif
-
-libnpth_la_LDFLAGS = $(no_undefined) $(export_symbols) \
+libnpth_la_LDFLAGS = $(no_undefined) $(export_symbols) $(extra_ltoptions) \
 	-version-info \
 	@LIBNPTH_LT_CURRENT@:@LIBNPTH_LT_REVISION@:@LIBNPTH_LT_AGE@
 libnpth_la_DEPENDENCIES = $(npth_deps)
