@@ -1,5 +1,5 @@
 /* npth.h - a lightweight implementation of pth over pthread.
-   Copyright (C) 2011 g10 Code GmbH
+   Copyright (C) 2011, 2015 g10 Code GmbH
 
    This file is part of NPTH.
 
