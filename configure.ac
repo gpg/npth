@@ -271,6 +271,7 @@ AC_SEARCH_LIBS([clock_gettime],[rt posix4])
 if test "x$ac_cv_search_clock_gettime" != no; then
     AC_DEFINE(HAVE_CLOCK_GETTIME,1,
               [Define to 1 if you have the `clock_gettime' function.])
+    config_libs="$config_libs $ac_cv_search_clock_gettime"
 fi
 
 
