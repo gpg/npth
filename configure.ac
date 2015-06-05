@@ -267,12 +267,21 @@ AC_CHECK_FUNCS([select pselect gettimeofday])
 npth_LIBSOCKET
 config_libs="$config_libs $LIBSOCKET"
 
-AC_SEARCH_LIBS([clock_gettime],[rt posix4])
-if test "x$ac_cv_search_clock_gettime" != no; then
-    AC_DEFINE(HAVE_CLOCK_GETTIME,1,
-              [Define to 1 if you have the `clock_gettime' function.])
-    config_libs="$config_libs $ac_cv_search_clock_gettime"
-fi
+# Save and restore LIBS so e.g., -lrt, isn't added to it.  Otherwise, *all*
+# programs in the package would end up linked with that potentially-shared
+# library, inducing unnecessary run-time overhead.
+LIB_CLOCK_GETTIME=
+AC_SUBST([LIB_CLOCK_GETTIME])
+gl_saved_libs=$LIBS
+AC_SEARCH_LIBS([clock_gettime], [rt posix4],
+               [if test "$ac_cv_search_clock_gettime" != "none required"; then
+                  LIB_CLOCK_GETTIME=$ac_cv_search_clock_gettime
+                  config_libs="$config_libs $LIB_CLOCK_GETTIME"
+                fi
+                AC_DEFINE([HAVE_CLOCK_GETTIME],1,
+                  [Define to 1 if you have the `clock_gettime' function.])
+                ])
+LIBS=$gl_saved_libs
 
 
 #

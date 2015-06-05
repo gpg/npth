@@ -35,11 +35,11 @@ TESTS = t-mutex t-thread
 if HAVE_W32_SYSTEM
 AM_CPPFLAGS = -I$(top_srcdir)/w32
 AM_LDFLAGS =
-LDADD = ../w32/libnpth.la
+LDADD = ../w32/libnpth.la $(LIB_CLOCK_GETTIME)
 else
 AM_CPPFLAGS = -I../src -D_POSIX_C_SOURCE=200112L
 AM_LDFLAGS =
-LDADD = ../src/libnpth.la $(LIBSOCKET)
+LDADD = ../src/libnpth.la $(LIBSOCKET) $(LIB_CLOCK_GETTIME)
 endif
 
 noinst_HEADERS = t-support.h
