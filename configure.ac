@@ -168,16 +168,27 @@ AM_CONDITIONAL(HAVE_W64_SYSTEM, test "$have_w64_system" = yes)
 # Generate values for the DLL version info
 #
 if test "$have_w32_system" = yes; then
-    BUILD_TIMESTAMP=`date --iso-8601=minutes`
     BUILD_ISODATE=`date --iso-8601`
     changequote(,)dnl
     BUILD_FILEVERSION=`echo "$VERSION" | sed 's/\([0-9.]*\).*/\1./;s/\./,/g'`
     changequote([,])dnl
     BUILD_FILEVERSION="${BUILD_FILEVERSION}git_revision_dec"
 fi
-AC_SUBST(BUILD_TIMESTAMP)
 AC_SUBST(BUILD_ISODATE)
 AC_SUBST(BUILD_FILEVERSION)
+AC_ARG_ENABLE([build-timestamp],
+  AC_HELP_STRING([--enable-build-timestamp],
+                 [set an explicit build timestamp for reproducibility.
+                  (default is the current time in ISO-8601 format)]),
+     [if test "$enableval" = "yes"; then
+        BUILD_TIMESTAMP=`date -u +%Y-%m-%dT%H:%M+0000 2>/dev/null || date`
+      else
+        BUILD_TIMESTAMP="$enableval"
+      fi],
+     [BUILD_TIMESTAMP="<none>"])
+AC_SUBST(BUILD_TIMESTAMP)
+AC_DEFINE_UNQUOTED(BUILD_TIMESTAMP, "$BUILD_TIMESTAMP",
+                   [The time this package was configured for a build])
 
 
 #
