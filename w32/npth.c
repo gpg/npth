@@ -40,7 +40,7 @@
 
 #include <stdio.h>
 #define DEBUG_CALLS 1
-#define _npth_debug(x, ...) printf(__VA_ARGS__)
+#define _npth_debug(x, ...) fprintf(stderr, __VA_ARGS__)
 
 #ifndef TEST
 #undef  DEBUG_CALLS
@@ -150,8 +150,8 @@ enter_npth (const char *function)
   int res;
 
   if (DEBUG_CALLS)
-    _npth_debug (DEBUG_CALLS, "enter_npth (%s)\n",
-		 function ? function : "unknown");
+    _npth_debug (DEBUG_CALLS, "tid %lu: enter_npth (%s)\n",
+		 npth_self (), function ? function : "unknown");
   LeaveCriticalSection (&sceptre);
 }
 
@@ -162,8 +162,8 @@ leave_npth (const char *function)
   EnterCriticalSection (&sceptre);
 
   if (DEBUG_CALLS)
-    _npth_debug (DEBUG_CALLS, "leave_npth (%s)\n",
-		 function ? function : "");
+    _npth_debug (DEBUG_CALLS, "tid %lu: leave_npth (%s)\n",
+		 npth_self (), function ? function : "");
 }
 
 #define ENTER() enter_npth(__FUNCTION__)
