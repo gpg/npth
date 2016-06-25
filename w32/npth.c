@@ -35,6 +35,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <io.h>
 
 #include "npth.h"
 
