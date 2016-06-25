@@ -248,9 +248,11 @@ AC_TYPE_SSIZE_T
 #
 # Checks for libraries and functions.
 #
+#   We test for pthread_detach because glibc 2.22 includes
+#   pthread_create but not pthread_detach.
 if test "$have_w32_system" = no; then
-  AC_SEARCH_LIBS([pthread_create],[pthread])
-  case "x$ac_cv_search_pthread_create" in
+  AC_SEARCH_LIBS([pthread_detach],[pthread])
+  case "x$ac_cv_search_pthread_detach" in
     xno)
       have_pthread=no
       ;;
@@ -259,7 +261,7 @@ if test "$have_w32_system" = no; then
       ;;
     *)
       have_pthread=yes
-      config_libs="$config_libs $ac_cv_search_pthread_create"
+      config_libs="$config_libs $ac_cv_search_pthread_detach"
       ;;
   esac
   if test "$have_pthread" != no; then
