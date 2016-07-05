@@ -125,9 +125,15 @@ case "${host}" in
     *-apple-darwin*)
         AC_DEFINE(_XOPEN_SOURCE, 500, Activate POSIX interface on MacOS X)
         ;;
+    *-*-aix*)
+	have_fork_unsafe_semaphore=yes
+        ;;
 esac
 
 AM_CONDITIONAL(HAVE_LD_VERSION_SCRIPT, test "$have_ld_version_script" = "yes")
+if test "$have_fork_unsafe_semaphore" = yes; then
+   AC_DEFINE(HAVE_FORK_UNSAFE_SEMAPHORE, 1, [Defined if we have fork-unsafe semaphore])
+fi
 
 # Set some default values
 config_libs="-lnpth"

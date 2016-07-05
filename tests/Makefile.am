@@ -40,6 +40,7 @@ else
 AM_CPPFLAGS = -I../src -D_POSIX_C_SOURCE=200112L
 AM_LDFLAGS =
 LDADD = ../src/libnpth.la $(LIBSOCKET) $(LIB_CLOCK_GETTIME)
+TESTS += t-fork
 endif
 
 noinst_HEADERS = t-support.h
