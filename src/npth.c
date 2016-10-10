@@ -257,7 +257,14 @@ npth_setname_np (npth_t target_thread, const char *name)
 #ifdef __NetBSD__
   return pthread_setname_np (target_thread, "%s", (void*) name);
 #else
+#ifdef __APPLE__
+  if (target_thread == npth_self ())
+    return pthread_setname_np (name);
+  else
+    return ENOTSUP;
+#else
   return pthread_setname_np (target_thread, name);
+#endif
 #endif
 #else
   (void)target_thread;
