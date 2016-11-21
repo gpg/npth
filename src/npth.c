@@ -93,6 +93,14 @@ static sem_t *sceptre = &sceptre_buffer;
    variable.  */
 static volatile pthread_t main_thread;
 
+/* This flag is set as soon as npth_init has been called or if any
+ * thread has been created.  It will never be cleared again.  The only
+ * purpose is to make npth_protect and npth_unprotect more robust in
+ * that they can be shortcut when npth_init has not yet been called.
+ * This is important for libraries which want to support nPth by using
+ * those two functions but may have be initialized before pPth. */
+static int initialized_or_any_threads;
+
 /* Systems that don't have pthread_mutex_timedlock get a busy wait
    implementation that probes the lock every BUSY_WAIT_INTERVAL
    milliseconds.  */
@@ -202,6 +210,9 @@ npth_init (void)
   int res;
 
   main_thread = pthread_self();
+
+  /* Track that we have been initialized.  */
+  initialized_or_any_threads |= 1;
 
   /* Better reset ERRNO so that we know that it has been set by
      sem_init.  */
@@ -314,6 +325,8 @@ npth_create (npth_t *thread, const npth_attr_t *attr,
   startup = malloc (sizeof (*startup));
   if (!startup)
     return errno;
+
+  initialized_or_any_threads |= 2;
 
   startup->start_routine = start_routine;
   startup->arg = arg;
@@ -716,14 +729,23 @@ npth_sendmsg (int fd, const struct msghdr *msg, int flags)
 void
 npth_unprotect (void)
 {
-  ENTER();
+  /* If we are not initialized we may not access the semaphore and
+   * thus we shortcut it. Note that in this case the unprotect/protect
+   * is not needed.  For failsafe reasons if an nPth thread has ever
+   * been created but nPth has accidentally not initialized we do not
+   * shortcut so that a stack backtrace (due to the access of the
+   * uninitialized semaphore) is more expressive.  */
+  if (initialized_or_any_threads)
+    ENTER();
 }
 
 
 void
 npth_protect (void)
 {
-  LEAVE();
+  /* See npth_unprotect for commentary.  */
+  if (initialized_or_any_threads)
+    LEAVE();
 }
 
 
