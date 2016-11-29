@@ -15,6 +15,16 @@
 #include <unistd.h>
 #include "t-support.h"
 
+/* This is a test if nPth can allow daemon-like applications
+   initializing earlier.
+
+   For daemon-like applications, ideally, it is expected to call
+   npth_init after fork.  This condition is not satisfied sometimes.
+
+   Failure of this test means nPth implementation doesn't allow
+   npth_init after fork.  In such a case, application should be
+   modified.
+ */
 
 int
 main (int argc, const char *argv[])

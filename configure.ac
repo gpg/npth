@@ -123,7 +123,8 @@ case "${host}" in
 	have_ld_version_script=yes
         ;;
     *-apple-darwin*)
-        AC_DEFINE(_XOPEN_SOURCE, 500, Activate POSIX interface on MacOS X)
+	AC_SEARCH_LIBS([dispatch_semaphore_create],[dispatch],
+	[AC_DEFINE([HAVE_LIB_DISPATCH],1,[Defined if we have libdispatch])])
         ;;
     *-*-aix*)
 	have_fork_unsafe_semaphore=yes
