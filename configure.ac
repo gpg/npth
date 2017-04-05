@@ -129,7 +129,7 @@ case "${host}" in
     *-*-aix*)
         have_fork_unsafe_semaphore=yes
         ;;
-    *-*-dragonfly*|*-*-netbsd*)
+    *-*-dragonfly*|*-*-freebsd*|*-*-netbsd*)
         LIBS="-lpthread $LIBS"
         AC_SEARCH_LIBS([sem_init],[rt])
         ;;
