@@ -117,17 +117,21 @@ LT_LANG([Windows Resource])
 have_ld_version_script=no
 case "${host}" in
     *-*-linux*)
-	have_ld_version_script=yes
+        have_ld_version_script=yes
         ;;
     *-*-gnu*)
-	have_ld_version_script=yes
+        have_ld_version_script=yes
         ;;
     *-apple-darwin*)
-	AC_SEARCH_LIBS([dispatch_semaphore_create],[dispatch],
-	[AC_DEFINE([HAVE_LIB_DISPATCH],1,[Defined if we have libdispatch])])
+        AC_SEARCH_LIBS([dispatch_semaphore_create],[dispatch],
+        [AC_DEFINE([HAVE_LIB_DISPATCH],1,[Defined if we have libdispatch])])
         ;;
     *-*-aix*)
-	have_fork_unsafe_semaphore=yes
+        have_fork_unsafe_semaphore=yes
+        ;;
+    *-*-netbsd*)
+        LIBS="-lpthread $LIBS"
+        AC_SEARCH_LIBS([sem_init],[rt])
         ;;
 esac
 
@@ -137,7 +141,7 @@ if test "$have_fork_unsafe_semaphore" = yes; then
 fi
 
 # Set some default values
-config_libs="-lnpth"
+config_libs="-lnpth $LIBS"
 have_w32_system=no
 have_w32ce_system=no
 have_w64_system=no
@@ -149,7 +153,7 @@ case "${host}" in
         ;;
     *-mingw32ce*)
         have_w32ce_system=yes
-	;;
+        ;;
 esac
 case "${host}" in
     *-mingw32ce*|*-mingw32*)
