@@ -50,9 +50,9 @@ AC_INIT([npth],[my_full_version],[gnupg-devel@gnupg.org])
 #   (Interfaces added:			AGE++)
 #   (Interfaces removed/changed:	AGE=0)
 #
-LIBNPTH_LT_CURRENT=0
-LIBNPTH_LT_AGE=0
-LIBNPTH_LT_REVISION=6
+LIBNPTH_LT_CURRENT=1
+LIBNPTH_LT_AGE=1
+LIBNPTH_LT_REVISION=0
 
 # If the API is changed in an incompatible way: increment the next counter.
 NPTH_CONFIG_API_VERSION=1
