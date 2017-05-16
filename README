@@ -15,9 +15,7 @@
 
 * License
 
-  nPth is currently released under a mixed LGPLv3+/GPLv2+ license.
-  This is to allow its use with GPLv2(only) software.  If there is a
-  need for other licensing terms, please contact us.
+  nPth is released under the LGPLv2+ license.
 
 * Porting hints
 

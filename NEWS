@@ -1,6 +1,14 @@
 Noteworthy changes in version 1.4 (unreleased)
 ----------------------------------------------
 
+ * On macOS make use of an unnamed semaphore.
+
+ * Build fixes for FreeBSD, NetBSD, and DragonFlyBSD.
+
+ * New function npth_is_protected to help debugging.
+
+ * Change license from LGPLv3+/GPLv2+ to LGPLv2+.
+
 
 Noteworthy changes in version 1.3 (2016-11-22)
 ----------------------------------------------

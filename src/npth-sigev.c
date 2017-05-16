@@ -1,64 +1,55 @@
 /* npth-sigev.c - signal handling interface
-   Copyright (C) 2011 g10 Code GmbH
-
-   This file is part of NPTH.
-
-   NPTH is free software; you can redistribute it and/or modify it
-   under the terms of either
-
-   - the GNU Lesser General Public License as published by the Free
-   Software Foundation; either version 3 of the License, or (at
-   your option) any later version.
-
-   or
-
-   - the GNU General Public License as published by the Free
-   Software Foundation; either version 2 of the License, or (at
-   your option) any later version.
-
-   or both in parallel, as here.
-
-   NPTH is distributed in the hope that it will be useful, but WITHOUT
-   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-   or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
-   License for more details.
-
-   You should have received a copies of the GNU General Public License
-   and the GNU Lesser General Public License along with this program;
-   if not, see <http://www.gnu.org/licenses/>.  */
+ * Copyright (C) 2011 g10 Code GmbH
+ *
+ * This file is part of nPth.
+ *
+ * nPth is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * nPth is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
+ * the GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this program; if not, see <https://www.gnu.org/licenses/>.
+ */
 
 /* This is a support interface to make it easier to handle signals.
-
-   The interfaces here support one (and only one) thread (here called
-   "main thread") in the application to monitor several signals while
-   selecting on filedescriptors.
-
-   First, the main thread should call npth_sigev_init.  This
-   initializes some global data structures used to record interesting
-   and pending signals.
-
-   Then, the main thread should call npth_sigev_add for every signal
-   it is interested in observing, and finally npth_sigev_fini.  This
-   will block the signal in the main threads sigmask.  Note that these
-   signals should also be blocked in all other threads.  Since they
-   are blocked in the main thread after calling npth_sigev_add, it is
-   recommended to call npth_sigev_add in the main thread before
-   creating any threads.
-
-   The function npth_sigev_sigmask is a convenient function that
-   returns the sigmask of the thread at time of npth_sigev_init, but
-   with all registered signals unblocked.  It is recommended to do all
-   other changes to the main thread's sigmask before calling
-   npth_sigev_init, so that the return value of npth_sigev_sigmask can
-   be used in the npth_pselect invocation.
-
-   In any case, the main thread should invoke npth_pselect with a
-   sigmask that has all signals that should be monitored unblocked.
-
-   After npth_pselect returns, npth_sigev_get_pending can be called in
-   a loop until it returns 0 to iterate over the list of pending
-   signals.  Each time a signal is returned by that function, its
-   status is reset to non-pending.  */
+ *
+ * The interfaces here support one (and only one) thread (here called
+ * "main thread") in the application to monitor several signals while
+ * selecting on filedescriptors.
+ *
+ * First, the main thread should call npth_sigev_init.  This
+ * initializes some global data structures used to record interesting
+ * and pending signals.
+ *
+ * Then, the main thread should call npth_sigev_add for every signal
+ * it is interested in observing, and finally npth_sigev_fini.  This
+ * will block the signal in the main threads sigmask.  Note that these
+ * signals should also be blocked in all other threads.  Since they
+ * are blocked in the main thread after calling npth_sigev_add, it is
+ * recommended to call npth_sigev_add in the main thread before
+ * creating any threads.
+ *
+ * The function npth_sigev_sigmask is a convenient function that
+ * returns the sigmask of the thread at time of npth_sigev_init, but
+ * with all registered signals unblocked.  It is recommended to do all
+ * other changes to the main thread's sigmask before calling
+ * npth_sigev_init, so that the return value of npth_sigev_sigmask can
+ * be used in the npth_pselect invocation.
+ *
+ * In any case, the main thread should invoke npth_pselect with a
+ * sigmask that has all signals that should be monitored unblocked.
+ *
+ * After npth_pselect returns, npth_sigev_get_pending can be called in
+ * a loop until it returns 0 to iterate over the list of pending
+ * signals.  Each time a signal is returned by that function, its
+ * status is reset to non-pending.
+ */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>

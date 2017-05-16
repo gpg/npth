@@ -6,7 +6,7 @@ Release: 1
 URL: http://www.gnupg.org/
 Source: ftp://ftp.gnupg.org/gcrypt/alpha
 Group: Development/Libraries
-Copyright: LGPLv3+/GPLv2+
+Copyright: LGPLv2+
 BuildRoot: %{_tmppath}/%{name}-%{version}
 BuildRequires: make
 Prereq: /sbin/ldconfig /sbin/install-info
