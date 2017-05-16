@@ -55,15 +55,18 @@
 
 /* The global lock that excludes all threads but one.  Note that this
    implements the single-user-thread policy, but also protects all our
-   global data such as the thread_table.  */
+   global data such as the thread_table.  GOT_SCEPTRE is a flag used
+   for debugging to tell wether we hold SCEPTRE.  */
 static CRITICAL_SECTION sceptre;
+static int got_sceptre;
+
 
 /* This flag is set as soon as npth_init has been called or if any
  * thread has been created.  It will never be cleared again.  The only
  * purpose is to make npth_protect and npth_unprotect more robust in
  * that they can be shortcut when npth_init has not yet been called.
  * This is important for libraries which want to support nPth by using
- * those two functions but may have be initialized before pPth. */
+ * those two functions but may have been initialized before nPth. */
 static int initialized_or_any_threads;
 
 
@@ -162,6 +165,7 @@ enter_npth (const char *function)
   if (DEBUG_CALLS)
     _npth_debug (DEBUG_CALLS, "tid %lu: enter_npth (%s)\n",
 		 npth_self (), function ? function : "unknown");
+  got_sceptre = 0;
   LeaveCriticalSection (&sceptre);
 }
 
@@ -170,6 +174,7 @@ static void
 leave_npth (const char *function)
 {
   EnterCriticalSection (&sceptre);
+  got_sceptre = 1;
 
   if (DEBUG_CALLS)
     _npth_debug (DEBUG_CALLS, "tid %lu: leave_npth (%s)\n",
@@ -1776,6 +1781,14 @@ npth_protect (void)
   if (initialized_or_any_threads)
     LEAVE();
 }
+
+
+int
+npth_is_protected (void)
+{
+  return got_sceptre;
+}
+
 
 
 /* Maximum number of extra handles.  We can only support 31 as that is

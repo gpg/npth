@@ -92,9 +92,12 @@ sem_wait (sem_t *sem)
    semaphore is safe and a mutex is not safe is that a mutex has an
    owner, while a semaphore does not.)  We init sceptre to a static
    buffer for use by sem_init; in case sem_open is used instead
-   SCEPTRE will changed to the value returned by sem_open.  */
+   SCEPTRE will changed to the value returned by sem_open.
+   GOT_SCEPTRE is a flag used for debugging to tell wether we hold
+   SCEPTRE.  */
 static sem_t sceptre_buffer;
 static sem_t *sceptre = &sceptre_buffer;
+static int got_sceptre;
 
 /* Configure defines HAVE_FORK_UNSAFE_SEMAPHORE if child process can't
    access non-shared unnamed semaphore which is created by its parent.
@@ -188,6 +191,7 @@ enter_npth (void)
 {
   int res;
 
+  got_sceptre = 0;
   res = sem_post (sceptre);
   assert (res == 0);
 }
@@ -204,6 +208,7 @@ leave_npth (void)
   } while (res < 0 && errno == EINTR);
 
   assert (!res);
+  got_sceptre = 1;
   errno = save_errno;
 }
 
@@ -748,6 +753,13 @@ npth_protect (void)
   /* See npth_unprotect for commentary.  */
   if (initialized_or_any_threads)
     LEAVE();
+}
+
+
+int
+npth_is_protected (void)
+{
+  return got_sceptre;
 }
 
 

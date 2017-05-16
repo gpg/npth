@@ -79,5 +79,6 @@ EXPORTS
     npth_eselect			@58
     npth_unprotect			@59
     npth_protect			@60
+    npth_is_protected                   @61
 
 ; END

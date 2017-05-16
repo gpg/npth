@@ -198,6 +198,9 @@ int npth_sendmsg (int fd, const struct msghdr *msg, int flags);
 void npth_unprotect (void);
 void npth_protect (void);
 
+/* Return true when we hold the sceptre.  This is used to debug
+ * problems with npth_unprotect and npth_protect.  */
+int npth_is_protected (void);
 
 int npth_clock_gettime(struct timespec *tp);
 

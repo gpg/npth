@@ -1,50 +1,52 @@
 /* npth.h - a lightweight implementation of pth over pthread.
-            Configured for: @NPTH_CONFIG_HOST@.
-   Copyright (C) 2011, 2012, 2015 g10 Code GmbH
+ *          Configured for: @NPTH_CONFIG_HOST@.
+ * Copyright (C) 2011, 2012, 2015, 2017 g10 Code GmbH
+ *
+ * This file is part of NPTH.
+ *
+ * NPTH is free software; you can redistribute it and/or modify it
+ * under the terms of either
+ *
+ * - the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 3 of the License, or (at
+ * your option) any later version.
+ *
+ * or
+ *
+ * - the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at
+ * your option) any later version.
+ *
+ * or both in parallel, as here.
+ *
+ * NPTH is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+ * License for more details.
+ *
+ * You should have received a copies of the GNU General Public License
+ * and the GNU Lesser General Public License along with this program;
+ * if not, see <http://www.gnu.org/licenses/>.
+ */
 
-   This file is part of NPTH.
-
-   NPTH is free software; you can redistribute it and/or modify it
-   under the terms of either
-
-   - the GNU Lesser General Public License as published by the Free
-   Software Foundation; either version 3 of the License, or (at
-   your option) any later version.
-
-   or
-
-   - the GNU General Public License as published by the Free
-   Software Foundation; either version 2 of the License, or (at
-   your option) any later version.
-
-   or both in parallel, as here.
-
-   NPTH is distributed in the hope that it will be useful, but WITHOUT
-   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-   or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
-   License for more details.
-
-   You should have received a copies of the GNU General Public License
-   and the GNU Lesser General Public License along with this program;
-   if not, see <http://www.gnu.org/licenses/>.  */
-
-/* Changes to Pth:
-
-   Return value and arguments follow strictly the pthread format:
-
-   * Return the error number instead of setting errno,
-
-   * have timedlock function instead of extra event argument,
-
-   * have trylock function instead of extra event argument.  Can't mix
-   timed and try.
-
-   * No _new functions.  Use _init functions instead.
-
-   * Attributes are set by specific instead of generic getter/setter
-   functions.
-
-   Offers replacement functions for sendmsg and recvmsg.  */
+/* Changes to GNU Pth:
+ *
+ * Return value and arguments follow strictly the pthread format:
+ *
+ * - Return the error number instead of setting errno,
+ *
+ * - have timedlock function instead of extra event argument,
+ *
+ * - have trylock function instead of extra event argument.  Can't mix
+ *   timed and try.
+ *
+ * - No _new functions.  Use _init functions instead.
+ *
+ * - Attributes are set by specific instead of generic getter/setter
+ *   functions.
+ *
+ * - Offers replacement functions for sendmsg and recvmsg.
+ */
 
 #ifndef _NPTH_H
 #define _NPTH_H
@@ -359,6 +361,10 @@ int npth_sendmsg (int fd, const struct msghdr *msg, int flags);
 void npth_unprotect (void);
 void npth_protect (void);
 
+/* If you run into problems with the above calls, this function can be
+ * used to examine in which state nPth is.  */
+int npth_is_protected (void);
+
 
 /* Because the timed functions work on timespec, we provide a clock
    interface for convenience and portability.  */
@@ -389,39 +395,41 @@ int npth_clock_gettime (struct timespec *tp);
     }									\
   } while (0)
 
+
 
 /* This is a support interface to make it easier to handle signals.
-
-   The interfaces here support one (and only one) thread (here called
-   "main thread") in the application to monitor several signals while
-   selecting on filedescriptors.
-
-   First, the main thread should call npth_sigev_init.  This
-   initializes some global data structures used to record interesting
-   and pending signals.
-
-   Then, the main thread should call npth_sigev_add for every signal
-   it is interested in observing, and finally npth_sigev_fini.  This
-   will block the signal in the main threads sigmask.  Note that these
-   signals should also be blocked in all other threads.  Since they
-   are blocked in the main thread after calling npth_sigev_add, it is
-   recommended to call npth_sigev_add in the main thread before
-   creating any threads.
-
-   The function npth_sigev_sigmask is a convenient function that
-   returns the sigmask of the thread at time of npth_sigev_init, but
-   with all registered signals unblocked.  It is recommended to do all
-   other changes to the main thread's sigmask before calling
-   npth_sigev_init, so that the return value of npth_sigev_sigmask can
-   be used in the npth_pselect invocation.
-
-   In any case, the main thread should invoke npth_pselect with a
-   sigmask that has all signals that should be monitored unblocked.
-
-   After npth_pselect returns, npth_sigev_get_pending can be called in
-   a loop until it returns 0 to iterate over the list of pending
-   signals.  Each time a signal is returned by that function, its
-   status is reset to non-pending.  */
+ *
+ * The interfaces here support one (and only one) thread (here called
+ * "main thread") in the application to monitor several signals while
+ * selecting on filedescriptors.
+ *
+ * First, the main thread should call npth_sigev_init.  This
+ * initializes some global data structures used to record interesting
+ * and pending signals.
+ *
+ * Then, the main thread should call npth_sigev_add for every signal
+ * it is interested in observing, and finally npth_sigev_fini.  This
+ * will block the signal in the main threads sigmask.  Note that these
+ * signals should also be blocked in all other threads.  Since they
+ * are blocked in the main thread after calling npth_sigev_add, it is
+ * recommended to call npth_sigev_add in the main thread before
+ * creating any threads.
+ *
+ * The function npth_sigev_sigmask is a convenient function that
+ * returns the sigmask of the thread at time of npth_sigev_init, but
+ * with all registered signals unblocked.  It is recommended to do all
+ * other changes to the main thread's sigmask before calling
+ * npth_sigev_init, so that the return value of npth_sigev_sigmask can
+ * be used in the npth_pselect invocation.
+ *
+ * In any case, the main thread should invoke npth_pselect with a
+ * sigmask that has all signals that should be monitored unblocked.
+ *
+ * After npth_pselect returns, npth_sigev_get_pending can be called in
+ * a loop until it returns 0 to iterate over the list of pending
+ * signals.  Each time a signal is returned by that function, its
+ * status is reset to non-pending.
+ */
 
 /* Start setting up signal event handling.  */
 void npth_sigev_init (void);
