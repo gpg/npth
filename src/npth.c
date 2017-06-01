@@ -156,7 +156,7 @@ busy_wait_for (trylock_func_t trylock, void *lock,
 	  break;
 	}
 
-      if (! npth_timercmp (abstime, &ts, <))
+      if (npth_timercmp (abstime, &ts, <))
 	{
 	  err = ETIMEDOUT;
 	  break;
