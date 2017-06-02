@@ -1,5 +1,8 @@
-Noteworthy changes in version 1.5 (unreleased)  [C1/A1/R_]
+Noteworthy changes in version 1.5 (2017-06-02)  [C1/A1/R1]
 ----------------------------------------------
+
+ * Fix the busy waiting emulation of pthread_mutex_timedlock for
+   Unices lacking that function; e.g. macOS Sierra.
 
 
 Noteworthy changes in version 1.4 (2017-05-16)  [C1/A1/R0]
