@@ -384,6 +384,7 @@ int
 npth_attr_destroy (npth_attr_t *attr)
 {
   free (*attr);
+  *attr = NULL;
   return 0;
 }
 
@@ -530,6 +531,9 @@ npth_create (npth_t *newthread, const npth_attr_t *user_attr,
   *newthread = thread_id;
 
   ResumeThread (thread->handle);
+
+  if (attr_allocated)
+    npth_attr_destroy (&attr);
 
   return 0;
 
