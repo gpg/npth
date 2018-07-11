@@ -26,47 +26,56 @@ min_automake_version="1.14"
 # the version number immediately after the release and do another
 # commit and push so that the git magic is able to work.
 # See below for the LT versions.
-m4_define(my_version, [1.6])
+m4_define([mym4_package],[npth])
+m4_define([mym4_major], [1])
+m4_define([mym4_minor], [6])
+
+# To start a new development series, i.e a new major or minor number
+# you need to mark an arbitrary commit before the first beta release
+# with an annotated tag.  For example a 2.1 branch starts off with
+# the tag "foo-2.1-base".  This is used as the base for counting
+# beta numbers before the first release of a series.
 
 # Below is m4 magic to extract and compute the git revision number,
 # the decimalized short revision number, a beta version string and a
-# flag indicating a development version (my_isgit). The latter works
-# by requiring the final tag in the repository.
-m4_define([git_revision],
-          m4_esyscmd([git rev-parse --short HEAD | tr -d '\n\r']))
-m4_define([git_revision_dec],
-          m4_esyscmd_s([echo $((0x$(echo ]git_revision[|head -c 4)))]))
-m4_define([git_betastring],
-          m4_esyscmd_s([git describe --match 'npth-[0-9].*[0-9]' --long|\
-                        awk -F- '$3!=0{print"-beta"$3}']))
-m4_define([my_isgit],m4_if(git_betastring,[],[no],[yes]))
-m4_define([my_full_version],[my_version[]git_betastring])
-
-AC_INIT([npth],[my_full_version],[gnupg-devel@gnupg.org])
-
+# flag indicating a development version (mym4_isbeta).  Note that the
+# m4 processing is done by autoconf and not during the configure run.
+m4_define([mym4_verslist], m4_split(m4_esyscmd([./autogen.sh --find-version] \
+                           mym4_package mym4_major mym4_minor),[:]))
+m4_define([mym4_isbeta],       m4_argn(2, mym4_verslist))
+m4_define([mym4_version],      m4_argn(4, mym4_verslist))
+m4_define([mym4_revision],     m4_argn(7, mym4_verslist))
+m4_define([mym4_revision_dec], m4_argn(8, mym4_verslist))
+m4_esyscmd([echo ]mym4_version[>VERSION])
+AC_INIT([mym4_package],[mym4_version], [https://bugs.gnupg.org])
 # LT Version numbers, remember to change them just *before* a release.
 #   (Code changed:			REVISION++)
 #   (Interfaces added/removed/changed:	CURRENT++, REVISION=0)
 #   (Interfaces added:			AGE++)
-#   (Interfaces removed/changed:	AGE=0)
+#   (Interfaces removed:		AGE=0)
 #
 LIBNPTH_LT_CURRENT=1
 LIBNPTH_LT_AGE=1
 LIBNPTH_LT_REVISION=1
+################################################
+
+AC_SUBST(LIBNPTH_LT_CURRENT)
+AC_SUBST(LIBNPTH_LT_AGE)
+AC_SUBST(LIBNPTH_LT_REVISION)
+
+VERSION_NUMBER=m4_esyscmd(printf "0x%02x%02x00" mym4_major mym4_minor)
+AC_SUBST(VERSION_NUMBER)
 
 # If the API is changed in an incompatible way: increment the next counter.
 NPTH_CONFIG_API_VERSION=1
 ##############################################
 
-PACKAGE=$PACKAGE_NAME
-VERSION=$PACKAGE_VERSION
-
 AC_CONFIG_AUX_DIR([build-aux])
+AM_INIT_AUTOMAKE([serial-tests dist-bzip2 no-dist-gzip])
+AM_MAINTAINER_MODE
 AC_CONFIG_SRCDIR([src/npth.c])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
-AM_INIT_AUTOMAKE([serial-tests dist-bzip2 no-dist-gzip])
-AM_MAINTAINER_MODE
 AC_CANONICAL_HOST
 AM_SILENT_RULES
 
@@ -80,15 +89,6 @@ AH_VERBATIM([_REENTRANT],
 
 # Checks for programs.
 AC_PROG_CC
-
-AC_SUBST(LIBNPTH_LT_CURRENT)
-AC_SUBST(LIBNPTH_LT_AGE)
-AC_SUBST(LIBNPTH_LT_REVISION)
-
-AC_SUBST(PACKAGE)
-AC_SUBST(VERSION)
-AC_DEFINE_UNQUOTED(PACKAGE, "$PACKAGE", [Name of this package])
-AC_DEFINE_UNQUOTED(VERSION, "$VERSION", [Version of this package])
 
 run_tests="yes"
 AC_ARG_ENABLE(tests,
@@ -365,8 +365,8 @@ AC_CONFIG_FILES(npth-config, chmod +x npth-config)
 AC_OUTPUT
 
 echo "
-        $PACKAGE_NAME-$PACKAGE_VERSION prepared for make
+        $PACKAGE_NAME v$PACKAGE_VERSION prepared for make
 
-        Revision: git_revision  (git_revision_dec)
+        Revision: mym4_revision  (mym4_revision_dec)
         Platform: $host
 "

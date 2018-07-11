@@ -20,7 +20,8 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-EXTRA_DIST = npth-config.in npth.m4 npth.spec.in autogen.sh autogen.rc HACKING
+EXTRA_DIST = npth-config.in npth.m4 npth.spec.in autogen.sh autogen.rc \
+             HACKING VERSION
 bin_SCRIPTS = npth-config
 m4datadir = $(datadir)/aclocal
 m4data_DATA = npth.m4
@@ -45,7 +46,6 @@ dist-hook: gen-ChangeLog
 	@set -e; \
 	sed -e 's/@pkg_version@/$(VERSION)/g' \
 	    $(top_srcdir)/npth.spec.in  > $(distdir)/npth.spec
-	echo "$(VERSION)" > $(distdir)/VERSION
 
 
 gen_start_date = 2011-12-01T00:00:00
