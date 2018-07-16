@@ -1,5 +1,9 @@
-Noteworthy changes in version 1.6 (unreleased)  [C1/A1/R)]
+Noteworthy changes in version 1.6 (2018-07-16)  [C1/A1/R2]
 ----------------------------------------------
+
+ * Fix library requirements for HPUX.  [#3980]
+
+ * Fix a minor memory leak on Windows.
 
 
 Noteworthy changes in version 1.5 (2017-06-02)  [C1/A1/R1]

@@ -56,7 +56,7 @@ AC_INIT([mym4_package],[mym4_version], [https://bugs.gnupg.org])
 #
 LIBNPTH_LT_CURRENT=1
 LIBNPTH_LT_AGE=1
-LIBNPTH_LT_REVISION=1
+LIBNPTH_LT_REVISION=2
 ################################################
 
 AC_SUBST(LIBNPTH_LT_CURRENT)
