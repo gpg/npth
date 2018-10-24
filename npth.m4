@@ -10,17 +10,19 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 AC_DEFUN([_AM_PATH_NPTH_CONFIG],
-[ AC_ARG_WITH(npth-prefix,
+[ AC_REQUIRE([AM_PATH_GPG_ERROR])
+  AC_ARG_WITH(npth-prefix,
             AC_HELP_STRING([--with-npth-prefix=PFX],
                            [prefix where NPTH is installed (optional)]),
      npth_config_prefix="$withval", npth_config_prefix="")
   if test "x$npth_config_prefix" != x ; then
       NPTH_CONFIG="$npth_config_prefix/bin/npth-config"
+  else
+      NPTH_CONFIG="$GPG_ERROR_CONFIG npth"
   fi
-  AC_PATH_PROG(NPTH_CONFIG, npth-config, no)
 
   if test "$NPTH_CONFIG" != "no" ; then
-    npth_version=`$NPTH_CONFIG --version`
+    npth_version=`CC=$CC $NPTH_CONFIG --modversion`
   fi
   npth_version_major=`echo $npth_version | \
                sed 's/\([[0-9]]*\)\.\([[0-9]]*\).*/\1/'`
@@ -73,7 +75,7 @@ AC_DEFUN([AM_PATH_NPTH],
      # If we have a recent NPTH, we should also check that the
      # API is compatible.
      if test "$req_npth_api" -gt 0 ; then
-        tmp=`$NPTH_CONFIG --api-version 2>/dev/null || echo 0`
+        tmp=`CC=$CC $NPTH_CONFIG --variable=api_version 2>/dev/null || echo 0`
         if test "$tmp" -gt 0 ; then
            AC_MSG_CHECKING([NPTH API version])
            if test "$req_npth_api" -eq "$tmp" ; then
@@ -86,15 +88,15 @@ AC_DEFUN([AM_PATH_NPTH],
      fi
   fi
   if test $ok = yes; then
-    NPTH_CFLAGS=`$NPTH_CONFIG --cflags`
-    NPTH_LIBS=`$NPTH_CONFIG --libs`
+    NPTH_CFLAGS=`CC=$CC $NPTH_CONFIG --cflags`
+    NPTH_LIBS=`CC=$CC $NPTH_CONFIG --libs`
     ifelse([$2], , :, [$2])
-    npth_config_host=`$NPTH_CONFIG --host 2>/dev/null || echo none`
+    npth_config_host=`CC=$CC $NPTH_CONFIG --variable=host 2>/dev/null || echo none`
     if test x"$npth_config_host" != xnone ; then
       if test x"$npth_config_host" != x"$host" ; then
         AC_MSG_WARN([[
 ***
-*** The config script $NPTH_CONFIG was
+*** The config script "$NPTH_CONFIG" was
 *** built for $npth_config_host and thus may not match the
 *** used host $host.
 *** You may want to use the configure option --with-npth-prefix
