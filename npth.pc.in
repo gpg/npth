@@ -1,0 +1,13 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+api_version=@NPTH_CONFIG_API_VERSION@
+host=@NPTH_CONFIG_HOST@
+
+Name: npth
+Description: New GNU Portable Threads Library
+Version: @PACKAGE_VERSION@
+Libs: -L${libdir} @NPTH_CONFIG_LIBS@
+Cflags: -I${includedir} @NPTH_CONFIG_CFLAGS@
+URL: https://www.gnupg.org/software/npth/index.html

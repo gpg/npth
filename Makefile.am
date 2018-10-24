@@ -20,8 +20,11 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = npth.pc
+
 EXTRA_DIST = npth-config.in npth.m4 npth.spec.in autogen.sh autogen.rc \
-             HACKING VERSION
+             HACKING VERSION npth.pc.in
 bin_SCRIPTS = npth-config
 m4datadir = $(datadir)/aclocal
 m4data_DATA = npth.m4

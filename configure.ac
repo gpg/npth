@@ -357,6 +357,7 @@ fi
 # Write output
 #
 AC_CONFIG_FILES([Makefile
+npth.pc
 src/npth.h
 src/Makefile
 w32/Makefile

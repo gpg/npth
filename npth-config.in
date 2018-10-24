@@ -71,7 +71,7 @@ while test $# -gt 0; do
 	    with_glib=yes
 	    ;;
         --version)
-            echo "@VERSION@"
+            echo "@PACKAGE_VERSION@"
 	    exit 0
 	    ;;
         --api-version)
