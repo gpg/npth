@@ -70,7 +70,16 @@ while test $# -gt 0; do
 	--glib)
 	    with_glib=yes
 	    ;;
-        --version)
+	--variable=*)
+	    case "${1#*=}" in
+		prefix) echo "$prefix" ;;
+		exec_prefix) echo "$exec_prefix" ;;
+		host) echo "@NPTH_CONFIG_HOST@" ;;
+		api_version) echo "@NPTH_CONFIG_API_VERSION@" ;;
+	    esac
+	    exit 0
+	    ;;
+	--modversion|--version)
             echo "@PACKAGE_VERSION@"
 	    exit 0
 	    ;;
