@@ -1,5 +1,5 @@
 # npth.m4 - autoconf macro to detect NPTH.
-# Copyright (C) 2002, 2003, 2004, 2011 g10 Code GmbH
+# Copyright (C) 2002, 2003, 2004, 2011, 2018 g10 Code GmbH
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -10,15 +10,21 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 AC_DEFUN([_AM_PATH_NPTH_CONFIG],
-[ AC_REQUIRE([AM_PATH_GPG_ERROR])
-  AC_ARG_WITH(npth-prefix,
+[ AC_ARG_WITH(npth-prefix,
             AC_HELP_STRING([--with-npth-prefix=PFX],
                            [prefix where NPTH is installed (optional)]),
      npth_config_prefix="$withval", npth_config_prefix="")
   if test "x$npth_config_prefix" != x ; then
       NPTH_CONFIG="$npth_config_prefix/bin/npth-config"
+  fi
+  if test x"$GPGRT_CONFIG" != x -a "$GPGRT_CONFIG" != "no"; then
+    if CC=$CC $GPGRT_CONFIG npth >/dev/null 2>&1; then
+      NPTH_CONFIG="$GPGRT_CONFIG npth"
+    else
+      NPTH_CONFIG=no
+    fi
   else
-      NPTH_CONFIG="$GPG_ERROR_CONFIG npth"
+    AC_PATH_PROG(NPTH_CONFIG, npth-config, no)
   fi
 
   if test "$NPTH_CONFIG" != "no" ; then
