@@ -88,9 +88,9 @@ AC_DEFUN([AM_PATH_NPTH],
     # API is compatible.
     if test "$req_npth_api" -gt 0 ; then
       if test -z "$use_gpgrt_config"; then
-        tmp=`CC=$CC $NPTH_CONFIG --variable=api_version 2>/dev/null || echo 0`
-      else
         tmp=`CC=$CC $NPTH_CONFIG --api-version 2>/dev/null || echo 0`
+      else
+        tmp=`CC=$CC $NPTH_CONFIG --variable=api_version 2>/dev/null || echo 0`
       fi
       if test "$tmp" -gt 0 ; then
         AC_MSG_CHECKING([NPTH API version])
