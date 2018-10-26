@@ -30,7 +30,11 @@ AC_DEFUN([_AM_PATH_NPTH_CONFIG],
   fi
 
   if test "$NPTH_CONFIG" != "no" ; then
-    npth_version=`CC=$CC $NPTH_CONFIG --modversion`
+    if test -z "$use_gpgrt_config"; then
+      npth_version=`CC=$CC $NPTH_CONFIG --version`
+    else
+      npth_version=`CC=$CC $NPTH_CONFIG --modversion`
+    fi
   fi
   npth_version_major=`echo $npth_version | \
                sed 's/\([[0-9]]*\)\.\([[0-9]]*\).*/\1/'`
@@ -80,26 +84,34 @@ AC_DEFUN([AM_PATH_NPTH],
     AC_MSG_RESULT(no)
   fi
   if test $ok = yes; then
-     # If we have a recent NPTH, we should also check that the
-     # API is compatible.
-     if test "$req_npth_api" -gt 0 ; then
+    # If we have a recent NPTH, we should also check that the
+    # API is compatible.
+    if test "$req_npth_api" -gt 0 ; then
+      if test -z "$use_gpgrt_config"; then
         tmp=`CC=$CC $NPTH_CONFIG --variable=api_version 2>/dev/null || echo 0`
-        if test "$tmp" -gt 0 ; then
-           AC_MSG_CHECKING([NPTH API version])
-           if test "$req_npth_api" -eq "$tmp" ; then
-             AC_MSG_RESULT([okay])
-           else
-             ok=no
-             AC_MSG_RESULT([does not match. want=$req_npth_api got=$tmp])
-           fi
+      else
+        tmp=`CC=$CC $NPTH_CONFIG --api-version 2>/dev/null || echo 0`
+      fi
+      if test "$tmp" -gt 0 ; then
+        AC_MSG_CHECKING([NPTH API version])
+        if test "$req_npth_api" -eq "$tmp" ; then
+          AC_MSG_RESULT([okay])
+        else
+          ok=no
+          AC_MSG_RESULT([does not match. want=$req_npth_api got=$tmp])
         fi
-     fi
+      fi
+    fi
   fi
   if test $ok = yes; then
     NPTH_CFLAGS=`CC=$CC $NPTH_CONFIG --cflags`
     NPTH_LIBS=`CC=$CC $NPTH_CONFIG --libs`
     ifelse([$2], , :, [$2])
-    npth_config_host=`CC=$CC $NPTH_CONFIG --variable=host 2>/dev/null || echo none`
+    if test -z "$use_gpgrt_config"; then
+      npth_config_host=`CC=$CC $NPTH_CONFIG --host 2>/dev/null || echo none`
+    else
+      npth_config_host=`CC=$CC $NPTH_CONFIG --variable=host 2>/dev/null || echo none`
+    fi
     if test x"$npth_config_host" != xnone ; then
       if test x"$npth_config_host" != x"$host" ; then
         AC_MSG_WARN([[
