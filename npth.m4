@@ -19,7 +19,7 @@ AC_DEFUN([_AM_PATH_NPTH_CONFIG],
   fi
 
   use_gpgrt_config=""
-  if test x"$NPTH_CONFIG" != x -a x"$GPGRT_CONFIG" != x -a "$GPGRT_CONFIG" != "no"; then
+  if test x"$NPTH_CONFIG" = x -a x"$GPGRT_CONFIG" != x -a "$GPGRT_CONFIG" != "no"; then
     if CC=$CC $GPGRT_CONFIG npth >/dev/null 2>&1; then
       NPTH_CONFIG="$GPGRT_CONFIG npth"
       use_gpgrt_config=yes
