@@ -17,13 +17,15 @@ AC_DEFUN([_AM_PATH_NPTH_CONFIG],
   if test "x$npth_config_prefix" != x ; then
       NPTH_CONFIG="$npth_config_prefix/bin/npth-config"
   fi
-  if test x"$GPGRT_CONFIG" != x -a "$GPGRT_CONFIG" != "no"; then
+
+  use_gpgrt_config=""
+  if test x"$NPTH_CONFIG" != x -a x"$GPGRT_CONFIG" != x -a "$GPGRT_CONFIG" != "no"; then
     if CC=$CC $GPGRT_CONFIG npth >/dev/null 2>&1; then
       NPTH_CONFIG="$GPGRT_CONFIG npth"
-    else
-      NPTH_CONFIG=no
+      use_gpgrt_config=yes
     fi
-  else
+  fi
+  if test -z "$use_gpgrt_config"; then
     AC_PATH_PROG(NPTH_CONFIG, npth-config, no)
   fi
 
