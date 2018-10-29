@@ -20,7 +20,7 @@ AC_DEFUN([_AM_PATH_NPTH_CONFIG],
 
   use_gpgrt_config=""
   if test x"$NPTH_CONFIG" = x -a x"$GPGRT_CONFIG" != x -a "$GPGRT_CONFIG" != "no"; then
-    if CC=$CC $GPGRT_CONFIG npth >/dev/null 2>&1; then
+    if $GPGRT_CONFIG npth --exists; then
       NPTH_CONFIG="$GPGRT_CONFIG npth"
       use_gpgrt_config=yes
     fi
@@ -31,9 +31,9 @@ AC_DEFUN([_AM_PATH_NPTH_CONFIG],
 
   if test "$NPTH_CONFIG" != "no" ; then
     if test -z "$use_gpgrt_config"; then
-      npth_version=`CC=$CC $NPTH_CONFIG --version`
+      npth_version=`$NPTH_CONFIG --version`
     else
-      npth_version=`CC=$CC $NPTH_CONFIG --modversion`
+      npth_version=`$NPTH_CONFIG --modversion`
     fi
   fi
   npth_version_major=`echo $npth_version | \
@@ -88,9 +88,9 @@ AC_DEFUN([AM_PATH_NPTH],
     # API is compatible.
     if test "$req_npth_api" -gt 0 ; then
       if test -z "$use_gpgrt_config"; then
-        tmp=`CC=$CC $NPTH_CONFIG --api-version 2>/dev/null || echo 0`
+        tmp=`$NPTH_CONFIG --api-version 2>/dev/null || echo 0`
       else
-        tmp=`CC=$CC $NPTH_CONFIG --variable=api_version 2>/dev/null || echo 0`
+        tmp=`$NPTH_CONFIG --variable=api_version 2>/dev/null || echo 0`
       fi
       if test "$tmp" -gt 0 ; then
         AC_MSG_CHECKING([NPTH API version])
@@ -104,13 +104,13 @@ AC_DEFUN([AM_PATH_NPTH],
     fi
   fi
   if test $ok = yes; then
-    NPTH_CFLAGS=`CC=$CC $NPTH_CONFIG --cflags`
-    NPTH_LIBS=`CC=$CC $NPTH_CONFIG --libs`
+    NPTH_CFLAGS=`$NPTH_CONFIG --cflags`
+    NPTH_LIBS=`$NPTH_CONFIG --libs`
     ifelse([$2], , :, [$2])
     if test -z "$use_gpgrt_config"; then
-      npth_config_host=`CC=$CC $NPTH_CONFIG --host 2>/dev/null || echo none`
+      npth_config_host=`$NPTH_CONFIG --host 2>/dev/null || echo none`
     else
-      npth_config_host=`CC=$CC $NPTH_CONFIG --variable=host 2>/dev/null || echo none`
+      npth_config_host=`$NPTH_CONFIG --variable=host 2>/dev/null || echo none`
     fi
     if test x"$npth_config_host" != xnone ; then
       if test x"$npth_config_host" != x"$host" ; then
