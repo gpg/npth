@@ -351,7 +351,7 @@ npth_init (void)
   thread = thread_table[thread_id];
   thread->handle = handle;
 
-  if (! TlsSetValue(tls_index, (LPVOID) thread_id))
+  if (! TlsSetValue(tls_index, (LPVOID)(uintptr_t) thread_id))
     return map_error (GetLastError());
 
   LEAVE();
@@ -449,11 +449,11 @@ npth_setname_np (npth_t target_thread, const char *name)
 static DWORD
 thread_start (void *arg)
 {
-  npth_t thread_id = (npth_t) arg;
+  npth_t thread_id = (npth_t)(uintptr_t) arg;
   npth_impl_t thread;
   void *result;
 
-  if (! TlsSetValue(tls_index, (LPVOID) thread_id))
+  if (! TlsSetValue(tls_index, (LPVOID)(uintptr_t) thread_id))
     /* FIXME: There is not much we can do here.  */
     ;
 
@@ -519,7 +519,7 @@ npth_create (npth_t *newthread, const npth_attr_t *user_attr,
 
   handle = CreateThread (NULL, 0,
 			 (LPTHREAD_START_ROUTINE)thread_start,
-			 (void *) thread_id, CREATE_SUSPENDED,
+			 (void *)(uintptr_t) thread_id, CREATE_SUSPENDED,
 			 NULL);
   if (handle == NULL)
     {
@@ -556,7 +556,7 @@ npth_self (void)
   if (thread_id == 0 && GetLastError() != ERROR_SUCCESS)
     /* FIXME: Log the error.  */
     ;
-  return (npth_t) thread_id;
+  return (npth_t)(uintptr_t) thread_id;
 }
 
 
