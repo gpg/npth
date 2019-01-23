@@ -51,6 +51,7 @@
 
 #include <pthread.h>
 
+#@INSERT_NO_RWLOCK@
 #ifdef __ANDROID__
 #include <android/api-level.h>
 #if __ANDROID_API__ < 9

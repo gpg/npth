@@ -268,6 +268,7 @@ if test "$have_w32_system" = no; then
   esac
   if test "$have_pthread" != no; then
     AC_DEFINE(HAVE_PTHREAD,1,[Define if we have pthread.])
+    AC_CHECK_TYPE([pthread_rwlock_t])
     AC_CHECK_FUNCS([pthread_tryjoin_np pthread_setname_np pthread_getname_np])
     AC_CHECK_FUNCS([pthread_mutex_timedlock])
     AC_CHECK_FUNCS([pthread_rwlock_rdlock pthread_rwlock_wrlock])
@@ -276,6 +277,12 @@ if test "$have_w32_system" = no; then
     AC_CHECK_FUNCS([pthread_atfork])
   fi
 fi
+
+INSERT_NO_RWLOCK="undef _NPTH_NO_RWLOCK"
+if test x"$ac_cv_type_pthread_rwlock_t" = xno; then
+  INSERT_NO_RWLOCK="define _NPTH_NO_RWLOCK 1"
+fi
+AC_SUBST(INSERT_NO_RWLOCK)
 
 AC_CHECK_FUNCS([select pselect gettimeofday])
 
