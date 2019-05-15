@@ -20,14 +20,12 @@
 
 TESTS = t-mutex t-thread
 
-# We explicitly require POSIX.1-2001 so that pthread_rwlock_t is
-# available when build with c99.
 if HAVE_W32_SYSTEM
 AM_CPPFLAGS = -I$(top_srcdir)/w32
 AM_LDFLAGS =
 LDADD = ../w32/libnpth.la $(LIB_CLOCK_GETTIME)
 else
-AM_CPPFLAGS = -I../src -D_POSIX_C_SOURCE=200112L
+AM_CPPFLAGS = -I../src
 AM_LDFLAGS =
 LDADD = ../src/libnpth.la $(LIBSOCKET) $(LIB_CLOCK_GETTIME)
 TESTS += t-fork
