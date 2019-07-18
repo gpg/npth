@@ -29,6 +29,7 @@ LDADD = ../src/libnpth.la $(LIBSOCKET) $(LIB_CLOCK_GETTIME)
 TESTS += t-fork
 endif
 
+LDADD += @LDADD_FOR_TESTS_KLUDGE@
 AM_LDFLAGS = -no-install
 
 noinst_HEADERS = t-support.h
