@@ -22,14 +22,14 @@ TESTS = t-mutex t-thread
 
 if HAVE_W32_SYSTEM
 AM_CPPFLAGS = -I$(top_srcdir)/w32
-AM_LDFLAGS =
 LDADD = ../w32/libnpth.la $(LIB_CLOCK_GETTIME)
 else
 AM_CPPFLAGS = -I../src
-AM_LDFLAGS =
 LDADD = ../src/libnpth.la $(LIBSOCKET) $(LIB_CLOCK_GETTIME)
 TESTS += t-fork
 endif
+
+AM_LDFLAGS = -no-install
 
 noinst_HEADERS = t-support.h
 
