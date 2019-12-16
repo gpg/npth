@@ -321,10 +321,10 @@ AC_SUBST(INSERT_NO_RWLOCK)
 
 case "${host}" in
     *-*-linux*|*-*-gnu*)
-        INSERT_EXPOSE_RWLOCK_API="define _NPTH_EXPOSE_RWLOCK_API (defined(__USE_UNIX98) || defined(__USE_XOPEN2K))"
+        INSERT_EXPOSE_RWLOCK_API="defined(__USE_UNIX98) || defined(__USE_XOPEN2K)"
         ;;
     *)
-        INSERT_EXPOSE_RWLOCK_API="define _NPTH_EXPOSE_RWLOCK_API 1"
+        INSERT_EXPOSE_RWLOCK_API="1"
         ;;
 esac
 AC_SUBST(INSERT_EXPOSE_RWLOCK_API)

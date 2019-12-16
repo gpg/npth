@@ -60,7 +60,6 @@
 #define _NPTH_NO_RWLOCK 1
 #endif
 #endif
-#@INSERT_EXPOSE_RWLOCK_API@
 
 #ifdef __cplusplus
 extern "C" {
@@ -217,7 +216,7 @@ int npth_mutex_timedlock(npth_mutex_t *mutex, const struct timespec *abstime);
 
 #define npth_mutex_unlock pthread_mutex_unlock
 
-#if _NPTH_EXPOSE_RWLOCK_API
+#if @INSERT_EXPOSE_RWLOCK_API@
 #ifdef _NPTH_NO_RWLOCK
 
 typedef int npth_rwlockattr_t;
