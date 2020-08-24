@@ -136,6 +136,7 @@ static int initialized_or_any_threads;
 
 typedef int (*trylock_func_t) (void *);
 
+#ifndef HAVE_PTHREAD_MUTEX_TIMEDLOCK
 static int
 busy_wait_for (trylock_func_t trylock, void *lock,
 	       const struct timespec *abstime)
@@ -174,7 +175,7 @@ busy_wait_for (trylock_func_t trylock, void *lock,
 
   return err;
 }
-
+#endif
 
 static void
 enter_npth (void)
