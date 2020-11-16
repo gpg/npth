@@ -45,7 +45,7 @@ thread_one (void *arg)
 static void *
 thread_twoone (void *arg)
 {
-  int rc, i;
+  int rc;
 
   npth_setname_np (npth_self (), "thread-twoone");
   info_msg ("thread-twoone started");

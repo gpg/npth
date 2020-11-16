@@ -19,15 +19,21 @@ main (int argc, char *argv[])
   int rc;
   npth_mutex_t mutex;
 
+  if (argc >= 2 && !strcmp (argv[1], "--verbose"))
+    opt_verbose = 1;
+
   rc = npth_init ();
   fail_if_err (rc);
 
   rc = npth_mutex_init (&mutex, NULL);
   fail_if_err (rc);
+  info_msg ("mutex initialized");
   rc = npth_mutex_lock (&mutex);
   fail_if_err (rc);
+  info_msg ("mutex locked");
   rc = npth_mutex_unlock (&mutex);
   fail_if_err (rc);
+  info_msg ("mutex unlocked");
 
   return 0;
 }
