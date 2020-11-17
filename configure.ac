@@ -47,7 +47,7 @@ m4_define([mym4_version],      m4_argn(4, mym4_verslist))
 m4_define([mym4_revision],     m4_argn(7, mym4_verslist))
 m4_define([mym4_revision_dec], m4_argn(8, mym4_verslist))
 m4_esyscmd([echo ]mym4_version[>VERSION])
-AC_INIT([mym4_package],[mym4_version], [https://bugs.gnupg.org])
+AC_INIT([mym4_package],[mym4_version],[https://bugs.gnupg.org])
 # LT Version numbers, remember to change them just *before* a release.
 #   (Code changed:			REVISION++)
 #   (Interfaces added/removed/changed:	CURRENT++, REVISION=0)
@@ -80,7 +80,7 @@ AC_CANONICAL_HOST
 AM_SILENT_RULES
 
 # Enable GNU extensions on systems that have them.
-AC_GNU_SOURCE
+AC_USE_SYSTEM_EXTENSIONS
 
 # Taken from mpfr-4.0.1, then modified for LDADD_FOR_TESTS_KLUDGE
 dnl Under Linux, make sure that the old dtags are used if LD_LIBRARY_PATH
@@ -127,7 +127,7 @@ AC_PROG_CC
 
 run_tests="yes"
 AC_ARG_ENABLE(tests,
-  AC_HELP_STRING([--disable-tests], [disable tests]),
+  AS_HELP_STRING([--disable-tests],[disable tests]),
          run_tests=$enableval)
 AM_CONDITIONAL(RUN_TESTS, test "$run_tests" = "yes")
 
@@ -214,8 +214,7 @@ fi
 AC_SUBST(BUILD_ISODATE)
 AC_SUBST(BUILD_FILEVERSION)
 AC_ARG_ENABLE([build-timestamp],
-  AC_HELP_STRING([--enable-build-timestamp],
-                 [set an explicit build timestamp for reproducibility.
+  AS_HELP_STRING([--enable-build-timestamp],[set an explicit build timestamp for reproducibility.
                   (default is the current time in ISO-8601 format)]),
      [if test "$enableval" = "yes"; then
         BUILD_TIMESTAMP=`date -u +%Y-%m-%dT%H:%M+0000 2>/dev/null || date`
