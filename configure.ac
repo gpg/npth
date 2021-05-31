@@ -125,6 +125,21 @@ AH_VERBATIM([_REENTRANT],
 # Checks for programs.
 AC_PROG_CC
 
+if test "$GCC" = yes; then
+    CFLAGS="$CFLAGS -Wall -Wcast-align -Wshadow -Wstrict-prototypes"
+
+    AC_MSG_CHECKING([if gcc supports -Wpointer-arith])
+    _gcc_cflags_save=$CFLAGS
+    CFLAGS="-Wpointer-arith"
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],_gcc_wopt=yes,_gcc_wopt=no)
+    AC_MSG_RESULT($_gcc_wopt)
+    CFLAGS=$_gcc_cflags_save;
+    if test x"$_gcc_wopt" = xyes ; then
+       CFLAGS="$CFLAGS -Wpointer-arith"
+    fi
+fi
+
+
 run_tests="yes"
 AC_ARG_ENABLE(tests,
   AS_HELP_STRING([--disable-tests],[disable tests]),
