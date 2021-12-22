@@ -71,6 +71,9 @@ sem_wait (sem_t *sem)
 #ifndef HAVE_PSELECT
 # include <signal.h>
 #endif
+#ifdef HAVE_POLL_H
+#include <poll.h>
+#endif
 
 #include "npth.h"
 
@@ -671,6 +674,69 @@ npth_pselect(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
     ;
   }
 #endif /*!HAVE_PSELECT*/
+  LEAVE();
+  return res;
+}
+
+
+int
+npth_poll (struct pollfd *fds, unsigned long nfds, int timeout)
+{
+  int res;
+
+  ENTER();
+  res = poll (fds, (nfds_t)nfds, timeout);
+  LEAVE();
+  return res;
+}
+
+
+int
+npth_ppoll (struct pollfd *fds, unsigned long nfds,
+            const struct timespec *timeout, const sigset_t *sigmask)
+{
+  int res;
+
+  ENTER();
+#ifdef HAVE_PPOLL
+  res = ppoll (fds, (nfds_t)nfds, timeout, sigmask);
+#else /*!HAVE_PPOLL*/
+  {
+#   ifdef __GNUC__
+#     warning Using a non race free ppoll emulation.
+#   endif
+
+    int t;
+
+    if (!timeout)
+      t = -1;
+    else if (timeout->tv_nsec >= 0 && timeout->tv_nsec < 1000000000)
+      t = timeout->tv_sec * 1000 + (timeout->tv_nsec + 999999) / 1000000;
+    else
+      {
+        errno = EINVAL;
+        res = -1;
+        goto leave;
+      }
+
+    if (sigmask)
+      {
+        int save_errno;
+        sigset_t savemask;
+
+        pthread_sigmask (SIG_SETMASK, sigmask, &savemask);
+        res = poll (fds, (nfds_t)nfds, timeout);
+        save_errno = errno;
+        pthread_sigmask (SIG_SETMASK, &savemask, NULL);
+        errno = save_errno;
+      }
+    else
+      res = poll (fds, (nfds_t)nfds, timeout);
+
+  leave:
+    ;
+  }
+#endif
   LEAVE();
   return res;
 }

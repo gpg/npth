@@ -18,7 +18,7 @@
 
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.67])
+AC_PREREQ([2.69])
 min_automake_version="1.14"
 
 # To build a release you need to create a tag with the version number
@@ -247,7 +247,7 @@ AC_DEFINE_UNQUOTED(BUILD_TIMESTAMP, "$BUILD_TIMESTAMP",
 #
 # fixme: For what do we need the sys/socket test?
 AC_CHECK_HEADERS([sys/socket.h sys/select.h unistd.h sys/time.h time.h \
-                  signal.h])
+                  signal.h poll.h])
 INSERT_SYS_SELECT_H=
 if test x"$ac_cv_header_sys_select_h" = xyes; then
   INSERT_SYS_SELECT_H="include <sys/select.h>"
@@ -343,7 +343,7 @@ case "${host}" in
 esac
 AC_SUBST(INSERT_EXPOSE_RWLOCK_API)
 
-AC_CHECK_FUNCS([select pselect gettimeofday])
+AC_CHECK_FUNCS([select pselect gettimeofday ppoll])
 
 npth_LIBSOCKET
 config_libs="$config_libs $LIBSOCKET"

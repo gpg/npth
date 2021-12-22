@@ -348,6 +348,11 @@ ssize_t npth_write(int fd, const void *buf, size_t nbytes);
 int npth_recvmsg (int fd, struct msghdr *msg, int flags);
 int npth_sendmsg (int fd, const struct msghdr *msg, int flags);
 
+struct pollfd;
+int npth_poll (struct pollfd *fds, unsigned long nfds, int timeout);
+int npth_ppoll (struct pollfd *fds, unsigned long nfds,
+                const struct timespec *timeout, const sigset_t *sigmask);
+
 /* For anything not covered here, you can enter/leave manually at your
    own risk.  */
 void npth_unprotect (void);
