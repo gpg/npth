@@ -725,13 +725,13 @@ npth_ppoll (struct pollfd *fds, unsigned long nfds,
         sigset_t savemask;
 
         pthread_sigmask (SIG_SETMASK, sigmask, &savemask);
-        res = poll (fds, (nfds_t)nfds, timeout);
+        res = poll (fds, (nfds_t)nfds, t);
         save_errno = errno;
         pthread_sigmask (SIG_SETMASK, &savemask, NULL);
         errno = save_errno;
       }
     else
-      res = poll (fds, (nfds_t)nfds, timeout);
+      res = poll (fds, (nfds_t)nfds, t);
 
   leave:
     ;
