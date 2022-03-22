@@ -106,7 +106,6 @@ npth_clock_gettime(struct timespec *tp)
 {
   FILETIME ftime;
   ULARGE_INTEGER systime;
-  unsigned long long usecs;
 
   GetSystemTimeAsFileTime (&ftime);
   systime.LowPart = ftime.dwLowDateTime;
@@ -150,8 +149,6 @@ calculate_timeout (const struct timespec *abstime, DWORD *msecs_r)
 static void
 enter_npth (const char *function)
 {
-  int res;
-
   if (DEBUG_CALLS)
     _npth_debug (DEBUG_CALLS, "tid %lu: enter_npth (%s)\n",
 		 npth_self (), function ? function : "unknown");
@@ -483,33 +480,18 @@ npth_create (npth_t *newthread, const npth_attr_t *user_attr,
 {
   int err = 0;
   npth_t thread_id = INVALID_THREAD_ID;
-  npth_attr_t attr;
-  int attr_allocated;
   npth_impl_t thread;
   HANDLE handle;
 
   /* We must stay protected here, because we access the global
      thread_table.  Also, creating a new thread is not a blocking
      operation.  */
-  if (user_attr)
-    {
-      attr = *user_attr;
-      attr_allocated = 0;
-    }
-  else
-    {
-      err = npth_attr_init (&attr);
-      if (err)
-	return err;
-      attr_allocated = 1;
-    }
-
   err = new_thread (&thread_id);
   if (err)
     goto err_out;
 
   thread = thread_table[thread_id];
-  if (attr->detachstate == NPTH_CREATE_DETACHED)
+  if (user_attr && (*user_attr)->detachstate == NPTH_CREATE_DETACHED)
     thread->detached = 1;
   else
     thread->refs += 1;
@@ -532,16 +514,11 @@ npth_create (npth_t *newthread, const npth_attr_t *user_attr,
 
   ResumeThread (thread->handle);
 
-  if (attr_allocated)
-    npth_attr_destroy (&attr);
-
   return 0;
 
  err_out:
   if (thread_id)
     free_thread (thread_id);
-  if (attr_allocated)
-    npth_attr_destroy (&attr);
 
   return err;
 }
@@ -566,7 +543,6 @@ npth_tryjoin_np (npth_t thread_id, void **thread_return)
 {
   int err;
   npth_impl_t thread;
-  int res;
 
   err = find_thread (thread_id, &thread);
   if (err)
@@ -597,7 +573,6 @@ npth_join (npth_t thread_id, void **thread_return)
 {
   int err;
   npth_impl_t thread;
-  int res;
 
   /* No need to allow competing threads to enter when we can get the
      lock immediately.  */
@@ -906,7 +881,6 @@ int
 npth_mutex_trylock (npth_mutex_t *mutex)
 {
   int err;
-  DWORD res;
 
   /* While we are protected, let's check for a static initializer.  */
   err = mutex_init_check (mutex);
@@ -1087,7 +1061,6 @@ npth_cond_broadcast (npth_cond_t *cond)
   int err;
   npth_impl_t thread;
   DWORD res;
-  int any;
 
   /* While we are protected, let's check for a static initializer.  */
   err = cond_init_check (cond);
@@ -1373,20 +1346,6 @@ npth_rwlock_init (npth_rwlock_t *rwlock_r,
 {
   int err;
   npth_rwlock_t rwlock;
-  npth_rwlockattr_t attr;
-  int attr_allocated;
-
-  if (user_attr != NULL)
-    {
-      attr = *user_attr;
-      attr_allocated = 0;
-    }
-  else
-    {
-      err = npth_rwlockattr_init (&attr);
-      if (err)
-	return err;
-    }
 
   /* We can not check *rwlock_r here, as it may contain random data.  */
   rwlock = malloc (sizeof (*rwlock));
@@ -1396,7 +1355,7 @@ npth_rwlock_init (npth_rwlock_t *rwlock_r,
       goto err_out;
     }
 
-  rwlock->prefer_writer = (attr->kind == NPTH_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP);
+  rwlock->prefer_writer = (user_attr && (*user_attr)->kind == NPTH_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP);
 
   err = npth_cond_init (&rwlock->reader_wait, NULL);
   if (err)
@@ -1421,12 +1380,11 @@ npth_rwlock_init (npth_rwlock_t *rwlock_r,
   *rwlock_r = rwlock;
 
  err_out:
-  if (attr_allocated)
-    npth_rwlockattr_destroy (&attr);
   return err;
 }
 
 
+#if 0 /* Not used.  */
 /* Must be called with global lock held.  */
 static int
 rwlock_init_check (npth_rwlock_t *rwlock)
@@ -1465,7 +1423,7 @@ rwlock_init_check (npth_rwlock_t *rwlock)
 
   return err;
 }
-
+#endif
 
 int
 npth_rwlock_destroy (npth_rwlock_t *rwlock)
@@ -1815,8 +1773,6 @@ npth_eselect(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
   /* Number of extra events.  */
   int nr_events = 0;
   HANDLE sock_event = INVALID_HANDLE_VALUE;
-  /* This will be (nr_obj - 1) == nr_events.  */
-  int sock_event_idx = -1;
   int res;
   DWORD ret;
   SOCKET fd;
@@ -1892,7 +1848,6 @@ npth_eselect(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
       return -1;
     }
 
-  sock_event_idx = nr_obj;
   obj[nr_obj] = sock_event;
   nr_obj++;
 
