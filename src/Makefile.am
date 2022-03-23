@@ -30,7 +30,7 @@ else
 libnpth_version_script_cmd =
 endif
 
-libnpth_la_SOURCES = npth.h npth.c npth-sigev.c
+libnpth_la_SOURCES = npth.c npth-sigev.c
 
 # AM_CPPFLAGS =
 # AM_CFLAGS =
