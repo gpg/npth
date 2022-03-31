@@ -139,6 +139,14 @@ if test "$GCC" = yes; then
     fi
 fi
 
+# We used to provide npth-config command always.  Now, it's
+# gpgrt-config command with npth.pc configuration file, which does
+# same thing.
+AC_ARG_ENABLE(install-npth-config,
+  AS_HELP_STRING([--enable-install-npth-config],[install npth-config command]),
+  install_npth_config=$enableval)
+AM_CONDITIONAL(INSTALL_NPTH_CONFIG, test "$install_npth_config" = "yes")
+
 
 run_tests="yes"
 AC_ARG_ENABLE(tests,

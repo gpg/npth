@@ -1,6 +1,10 @@
 Noteworthy changes in version 1.7 (unreleased)  [C1/A1/R_]
 ----------------------------------------------
 
+ * The npth-config command is not installed by default, because it is
+   now replaced by use of pkg-config/gpgrt-config with npth.pc.
+   Supply --enable-install-npth-config configure option, if needed.
+
 
 Noteworthy changes in version 1.6 (2018-07-16)  [C1/A1/R2]
 ----------------------------------------------
