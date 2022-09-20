@@ -284,13 +284,13 @@ case "${host}" in
   *-*-mingw32*)
     # socklen_t may or may not be defined depending on what headers
     # are included.  To be safe we use int as this is the actual type.
-    INSERT_SOCKLEN_T="define _npth_socklen_t int"
+    INSERT_SOCKLEN_T="define npth_socklen_t int"
     ;;
   *)
     if test ".$gl_cv_socklen_t_equiv" = "."; then
-      INSERT_SOCKLEN_T="define _npth_socklen_t socklen_t"
+      INSERT_SOCKLEN_T="define npth_socklen_t socklen_t"
     else
-      INSERT_SOCKLEN_T="define _npth_socklen_t ${gl_cv_socklen_t_equiv}"
+      INSERT_SOCKLEN_T="define npth_socklen_t ${gl_cv_socklen_t_equiv}"
     fi
 esac
 AC_SUBST(INSERT_SOCKLEN_T)
@@ -335,9 +335,9 @@ if test "$have_w32_system" = no; then
   fi
 fi
 
-INSERT_NO_RWLOCK="undef _NPTH_NO_RWLOCK"
+INSERT_NO_RWLOCK="undef NPTH_NO_RWLOCK"
 if test x"$ac_cv_type_pthread_rwlock_t" = xno; then
-  INSERT_NO_RWLOCK="define _NPTH_NO_RWLOCK 1"
+  INSERT_NO_RWLOCK="define NPTH_NO_RWLOCK 1"
 fi
 AC_SUBST(INSERT_NO_RWLOCK)
 

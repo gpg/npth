@@ -37,8 +37,8 @@
  * - Offers replacement functions for sendmsg and recvmsg.
  */
 
-#ifndef _NPTH_H
-#define _NPTH_H
+#ifndef NPTH_H
+#define NPTH_H
 
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -57,7 +57,7 @@
 #if __ANDROID_API__ < 9
 /* Android 8 and earlier are missing rwlocks.  We punt to mutexes in
    that case.  */
-#define _NPTH_NO_RWLOCK 1
+#define NPTH_NO_RWLOCK 1
 #endif
 #endif
 
@@ -217,7 +217,7 @@ int npth_mutex_timedlock(npth_mutex_t *mutex, const struct timespec *abstime);
 #define npth_mutex_unlock pthread_mutex_unlock
 
 #if @INSERT_EXPOSE_RWLOCK_API@
-#ifdef _NPTH_NO_RWLOCK
+#ifdef NPTH_NO_RWLOCK
 
 typedef int npth_rwlockattr_t;
 #define npth_rwlockattr_init(attr)
@@ -242,7 +242,7 @@ typedef npth_mutex_t npth_rwlock_t;
 #define npth_rwlock_timedwrlock npth_mutex_timedlock
 #define npth_rwlock_unlock npth_mutex_unlock
 
-#else /* _NPTH_NO_RWLOCK */
+#else /* NPTH_NO_RWLOCK */
 
 #define npth_rwlockattr_t pthread_rwlockattr_t
 #define npth_rwlockattr_init pthread_rwlockattr_init
@@ -285,7 +285,7 @@ int npth_rwlock_timedwrlock (npth_rwlock_t *rwlock,
 			     const struct timespec *abstime);
 #define npth_rwlock_unlock  pthread_rwlock_unlock
 
-#endif /* !_NPTH_NO_RWLOCK */
+#endif /* !NPTH_NO_RWLOCK */
 #endif
 
 
@@ -337,8 +337,8 @@ int npth_system(const char *cmd);
 #define npth_sigmask pthread_sigmask
 int npth_sigwait(const sigset_t *set, int *sig);
 
-int npth_connect(int s, const struct sockaddr *addr, _npth_socklen_t addrlen);
-int npth_accept(int s, struct sockaddr *addr, _npth_socklen_t *addrlen);
+int npth_connect(int s, const struct sockaddr *addr, npth_socklen_t addrlen);
+int npth_accept(int s, struct sockaddr *addr, npth_socklen_t *addrlen);
 int npth_select(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
 		struct timeval *timeout);
 int npth_pselect(int nfd, fd_set *rfds, fd_set *wfds, fd_set *efds,
@@ -452,7 +452,7 @@ int npth_sigev_get_pending (int *r_signum);
 #ifdef __cplusplus
 }
 #endif
-#endif /*_NPTH_H*/
+#endif /*NPTH_H*/
 /*
 @emacs_local_vars_begin@
 @emacs_local_vars_read_only@

@@ -17,8 +17,8 @@
  * License along with this program; if not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef _NPTH_H
-#define _NPTH_H
+#ifndef NPTH_H
+#define NPTH_H
 
 #include <sys/types.h>
 #include <time.h>
@@ -225,4 +225,4 @@ int npth_sigev_get_pending (int *r_signum);
 #ifdef __cplusplus
 }
 #endif
-#endif /*_NPTH_H*/
+#endif /*NPTH_H*/
