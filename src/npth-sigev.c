@@ -77,7 +77,7 @@ static int sigev_signum_cnt;
 
 /* The internal handler which just sets a global flag.  */
 static void
-sigev_handler (int signum)
+_sigev_handler (int signum)
 {
   sigaddset (&sigev_pending, signum);
 }
@@ -109,7 +109,7 @@ npth_sigev_add (int signum)
   sigdelset (&sigev_unblock, signum);
   sigaddset (&sigev_block, signum);
 
-  sa.sa_handler = sigev_handler;
+  sa.sa_handler = _sigev_handler;
   sa.sa_mask = ss;
   sa.sa_flags = 0; /* NOT setting SA_RESTART! */
 

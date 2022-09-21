@@ -413,7 +413,7 @@ npth_mutex_timedlock (npth_mutex_t *mutex, const struct timespec *abstime)
 }
 
 
-#ifndef NPTH_NO_RWLOCK
+#ifndef _NPTH_NO_RWLOCK
 int
 npth_rwlock_rdlock (npth_rwlock_t *rwlock)
 {

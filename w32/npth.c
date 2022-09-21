@@ -31,13 +31,13 @@
 
 #include <stdio.h>
 #define DEBUG_CALLS 1
-#define npth_debug(x, ...) fprintf(stderr, __VA_ARGS__)
+#define _npth_debug(x, ...) fprintf(stderr, __VA_ARGS__)
 
 #ifndef TEST
 #undef  DEBUG_CALLS
 #define DEBUG_CALLS 0
-#undef npth_debug
-#define npth_debug(x, ...)
+#undef _npth_debug
+#define _npth_debug(x, ...)
 #endif
 
 /* This seems to be a common standard.  */
@@ -150,8 +150,8 @@ static void
 enter_npth (const char *function)
 {
   if (DEBUG_CALLS)
-    npth_debug (DEBUG_CALLS, "tid %lu: enter_npth (%s)\n",
-                npth_self (), function ? function : "unknown");
+    _npth_debug (DEBUG_CALLS, "tid %lu: enter_npth (%s)\n",
+		 npth_self (), function ? function : "unknown");
   got_sceptre = 0;
   LeaveCriticalSection (&sceptre);
 }
@@ -164,8 +164,8 @@ leave_npth (const char *function)
   got_sceptre = 1;
 
   if (DEBUG_CALLS)
-    npth_debug (DEBUG_CALLS, "tid %lu: leave_npth (%s)\n",
-                npth_self (), function ? function : "");
+    _npth_debug (DEBUG_CALLS, "tid %lu: leave_npth (%s)\n",
+		 npth_self (), function ? function : "");
 }
 
 #define ENTER() enter_npth(__FUNCTION__)
