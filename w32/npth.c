@@ -696,8 +696,19 @@ int
 npth_setspecific (npth_key_t key, const void *pointer)
 {
   BOOL res;
+  union {
+    const void *p_readonly;
+    void *p_writable;
+  } p;
 
-  res = TlsSetValue (key, (void *) pointer);
+  /*
+   * In the API of TlsSetValue, the second argument type is a pointer
+   * (writable object).  It were better to have a pointer type
+   * (readonly object), as in the POSIX thread API.  To express that
+   * it's our intentional type casting, we use union here.
+   */
+  p.p_readonly = pointer;
+  res = TlsSetValue (key, p.p_writable);
   if (res == 0)
     return map_error (GetLastError());
 
