@@ -1458,7 +1458,7 @@ npth_rwlock_destroy (npth_rwlock_t *rwlock)
     /* FIXME: Log this.  */
     ;
 
-  free (rwlock);
+  free (*rwlock);
 
   *rwlock = NULL;
   return 0;
