@@ -30,7 +30,11 @@ TESTS += t-fork
 endif
 
 LDADD += @LDADD_FOR_TESTS_KLUDGE@
+if HAVE_W32_SYSTEM
+AM_LDFLAGS = -no-fast-install
+else
 AM_LDFLAGS = -no-install
+endif
 
 noinst_HEADERS = t-support.h
 
