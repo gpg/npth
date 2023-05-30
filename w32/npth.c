@@ -824,7 +824,7 @@ static int
 mutex_init_check (npth_mutex_t *mutex)
 {
   int err;
-  npth_mutexattr_t attr;
+  npth_mutexattr_t attr = NULL;
   int kind;
 
   if (*mutex == 0)
