@@ -24,7 +24,7 @@ pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = npth.pc
 
 EXTRA_DIST = npth-config.in npth.m4 npth.spec.in autogen.sh autogen.rc \
-             HACKING VERSION npth.pc.in
+             HACKING VERSION npth.pc.in build-aux/libtool-patch.sed
 if INSTALL_NPTH_CONFIG
 bin_SCRIPTS = npth-config
 else
