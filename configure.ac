@@ -164,6 +164,7 @@ LT_LANG([Windows Resource])
 # For now we hardcode the use of version scripts.  It would be better
 # to write a test for this or even implement this within libtool.
 have_ld_version_script=no
+have_fork_unsafe_semaphore=no
 case "${host}" in
     *-*-linux*)
         have_ld_version_script=yes
@@ -224,9 +225,8 @@ AC_CONFIG_COMMANDS([libtool-patch],[[
   ;;
 esac
 
-if test "$have_fork_unsafe_semaphore" = yes; then
-   AC_DEFINE(HAVE_FORK_UNSAFE_SEMAPHORE, 1, [Defined if we have fork-unsafe semaphore])
-fi
+AM_CONDITIONAL(NPTH_FORK_FAILURE, test "$have_fork_unsafe_semaphore" = "yes")
+
 
 # Set some default values
 config_libs="-lnpth $LIBS"

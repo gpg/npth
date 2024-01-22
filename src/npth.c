@@ -92,32 +92,6 @@ static sem_t sceptre_buffer;
 static sem_t *sceptre = &sceptre_buffer;
 static int got_sceptre;
 
-/* Configure defines HAVE_FORK_UNSAFE_SEMAPHORE if child process can't
-   access non-shared unnamed semaphore which is created by its parent.
-
-   We use unnamed semaphore (if available) for the global lock.  The
-   specific semaphore is only valid for those threads in a process,
-   and it is no use by other processes.  Thus, PSHARED argument for
-   sem_init is naturally 0.
-
-   However, there are daemon-like applications which use fork after
-   npth's initialization by npth_init.  In this case, a child process
-   uses the semaphore which was created by its parent process, while
-   parent does nothing with the semaphore.  In some system (e.g. AIX),
-   access by child process to non-shared unnamed semaphore is
-   prohibited.  For such a system, HAVE_FORK_UNSAFE_SEMAPHORE should
-   be defined, so that unnamed semaphore will be created with the
-   option PSHARED=1.  The purpose of the setting of PSHARED=1 is only
-   for allowing the access of the lock by child process.  For NPTH, it
-   does not mean any other interactions between processes.
-
- */
-#ifdef HAVE_FORK_UNSAFE_SEMAPHORE
-#define NPTH_SEMAPHORE_PSHARED 1
-#else
-#define NPTH_SEMAPHORE_PSHARED 0
-#endif
-
 /* The main thread is the active thread at the time pth_init was
    called.  As of now it is only useful for debugging.  The volatile
    make sure the compiler does not eliminate this set but not used
@@ -224,8 +198,8 @@ npth_init (void)
      sem_init.  */
   errno = 0;
 
-  /* The semaphore is binary.  */
-  res = sem_init (sceptre, NPTH_SEMAPHORE_PSHARED, 1);
+  /* The semaphore is not shared and binary.  */
+  res = sem_init (sceptre, 0, 1);
   /* There are some versions of operating systems which have sem_init
      symbol defined but the call actually returns ENOSYS at runtime.
      We know this problem for older versions of AIX (<= 4.3.3) and

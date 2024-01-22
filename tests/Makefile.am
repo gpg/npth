@@ -19,6 +19,7 @@
 ## Process this file with automake to produce Makefile.in
 
 TESTS = t-mutex t-thread
+XFAIL_TESTS =
 
 if HAVE_W32_SYSTEM
 AM_CPPFLAGS = -I$(top_srcdir)/w32
@@ -26,7 +27,12 @@ LDADD = ../w32/libnpth.la $(LIB_CLOCK_GETTIME)
 else
 AM_CPPFLAGS = -I../src
 LDADD = ../src/libnpth.la $(LIBSOCKET) $(LIB_CLOCK_GETTIME)
+if NPTH_FORK_FAILURE
+# Fork failure is expected on such a system
+XFAIL_TESTS += t-fork
+else
 TESTS += t-fork
+endif
 endif
 
 LDADD += @LDADD_FOR_TESTS_KLUDGE@
