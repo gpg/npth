@@ -60,6 +60,10 @@ NPTH_1.0 {
     npth_getname_np;
     npth_setname_np;
 
+    npth_poll;
+    npth_ppoll;
+
+
   local:
     *;
 
