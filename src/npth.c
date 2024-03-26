@@ -29,15 +29,16 @@
 #include <pthread.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#ifdef HAVE_LIB_DISPATCH
-# include <dispatch/dispatch.h>
-typedef dispatch_semaphore_t sem_t;
 
+/* nPth uses the API of sem_init, sem_post, and sem_wait.  */
+#ifdef HAVE_LIB_DISPATCH
 /* This glue code is for macOS which does not have full implementation
    of POSIX semaphore.  On macOS, using semaphore in Grand Central
    Dispatch library is better than using the partial implementation of
    POSIX semaphore where sem_init doesn't work well.
  */
+# include <dispatch/dispatch.h>
+typedef dispatch_semaphore_t sem_t;
 
 static int
 sem_init (sem_t *sem, int is_shared, unsigned int value)
@@ -62,9 +63,72 @@ sem_wait (sem_t *sem)
   dispatch_semaphore_wait (*sem, DISPATCH_TIME_FOREVER);
   return 0;
 }
+#elif HAVE_NO_POSIX_SEMAPHORE
+/* Fallback implementation without POSIX semaphore,
+   for a system like MacOS Tiger and Leopard.  */
+typedef struct {
+  pthread_mutex_t mutex;
+  pthread_cond_t cond;
+  unsigned int value;
+} sem_t;
+
+static int
+sem_init (sem_t *sem, int is_shared, unsigned int value)
+{
+  int r;
+
+  (void)is_shared;              /* Not supported.  */
+  r = pthread_mutex_init (&sem->mutex, NULL);
+  if (r)
+    return r;
+  r = pthread_cond_init (&sem->cond, NULL);
+  if (r)
+    return r;
+  sem->value = value;
+  return 0;
+}
+
+static int
+sem_post (sem_t *sem)
+{
+  int r;
+
+  r = pthread_mutex_lock (&sem->mutex);
+  if (r)
+    return r;
+
+  sem->value++;
+  pthread_cond_signal (&sem->cond);
+
+  r = pthread_mutex_unlock (&sem->mutex);
+  if (r)
+    return r;
+  return 0;
+}
+
+static int
+sem_wait (sem_t *sem)
+{
+  int r;
+
+  r = pthread_mutex_lock (&sem->mutex);
+  if (r)
+    return r;
+
+  while (sem->value == 0)
+    pthread_cond_wait (&sem->cond, &sem->mutex);
+  sem->value--;
+
+  r = pthread_mutex_unlock (&sem->mutex);
+  if (r)
+    return r;
+  return 0;
+}
 #else
+/* Use POSIX semaphore when available.  */
 # include <semaphore.h>
 #endif
+
 #ifdef HAVE_UNISTD_H
 # include <unistd.h>
 #endif

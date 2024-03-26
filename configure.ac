@@ -175,6 +175,9 @@ case "${host}" in
     *-apple-darwin*)
         AC_SEARCH_LIBS([dispatch_semaphore_create],[dispatch],
         [AC_DEFINE([HAVE_LIB_DISPATCH],1,[Defined if we have libdispatch])])
+        if test "$ac_cv_search_dispatch_semaphore_create" = no; then
+           AC_DEFINE(HAVE_NO_POSIX_SEMAPHORE,1,[Define if no good semaphore.])
+        fi
         ;;
     *-*-aix*)
         have_fork_unsafe_semaphore=yes
